@@ -1,0 +1,12 @@
+{
+  "name": "my-typescript-project",
+  "module": "src/lib.ts",
+  "type": "module",
+  "scripts": {
+    "build": "bun run ./deploy/build.js",
+    "dev":"bun run ./deploy/dev.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
