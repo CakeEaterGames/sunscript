@@ -1,8 +1,9 @@
 import { lex } from "./lexer"
+import { Action, Alias, commonTypes, LUNFilter, range, Rule, SUNFilter } from "./types";
 import { isAlphaNum } from "./utils"
 
 
-export type commonTypes = string | boolean | undefined | number;
+
 
 type savestate = {
   cur: string,
@@ -13,45 +14,6 @@ type response<T> =
   | { type: "success"; value: T }
   | { type: "error"; error: string };
 
-export type Rule = {
-  filters?: Array<Filter>,
-  actions?: Array<Action>,
-  alias?: Alias,
-  pp?: boolean
-  return?: boolean
-}
-type SUNFilter = {
-  negative?: boolean;
-  loaded?: boolean,
-  ready?: boolean,
-  alias?: string,
-  tier?: number,
-  rarity?: number,
-  value?: range | commonTypes,
-  [key: string]: range | commonTypes,
-}
-type LUNFilter = {
-  negative: boolean | undefined;
-  [key: string]: range | commonTypes,
-}
-export type Filter = SUNFilter | LUNFilter
-
-//  [key: string]: any; // Allows any string keys with any values
-type Action = {
-  k: string,
-  v: commonTypes,
-}
-type Alias = {
-  k: string,
-  v: string,
-}
-
-
-export type range = {
-  type: "range",
-  min: number | undefined,
-  max: number | undefined
-}
 
 let tokens: Array<string> = []
 let cur: string = tokens[0]
@@ -342,6 +304,7 @@ function parseSUN(): response<SUNFilter> {
   stackLog("parseSUN")
 
   let r: SUNFilter = {
+    type: "sun",
     negative: undefined,
     loaded: undefined,
     ready: undefined,
@@ -381,7 +344,7 @@ function parseSUN(): response<SUNFilter> {
       r.alias = cur[0]
       if (!isNaN(Number(cur[1]))) r.tier = Number(cur[1])
       advance()
-      if ((cur + "").length == 1 && !isNaN(Number(cur))) {
+      if (cur!=" " && (cur + "").length == 1 && !isNaN(Number(cur))) {
         r.rarity = Number(cur);
         advance()
       }
@@ -389,11 +352,11 @@ function parseSUN(): response<SUNFilter> {
     case 1: {
       r.alias = cur[0]
       advance()
-      if ((cur + "").length == 1 && !isNaN(Number(cur))) {
+      if (cur!=" " && (cur + "").length == 1 && !isNaN(Number(cur))) {
         r.tier = Number(cur);
         advance()
       }
-      if ((cur + "").length == 1 && !isNaN(Number(cur))) {
+      if (cur!=" " && (cur + "").length == 1 && !isNaN(Number(cur))) {
         r.rarity = Number(cur);
         advance()
       }
@@ -401,6 +364,9 @@ function parseSUN(): response<SUNFilter> {
     } break;
     default: return error("SUN Rule Error. Expected an alias char, but got " + cur);
   }
+
+  if(r.alias=="*") r.alias = undefined;
+ 
 
   if (cur == "[") {
     consume("[")
@@ -414,6 +380,7 @@ function parseSUN(): response<SUNFilter> {
     let end = consume("]")
     if (end.type == "error") return end;
   }
+
   if (cur != ' ' && cur != ';' && cur != '->') {
     return error("SUN Rule Error. Expected -> or ; or space but got " + cur);
   }
@@ -437,7 +404,7 @@ function parseSUN(): response<SUNFilter> {
 function parseLUN(): response<LUNFilter> {
   stackLog("parseLUN")
 
-  let res: LUNFilter = { negative: undefined }
+  let res: LUNFilter = { type: "lun", negative: undefined }
   if (!isAlphaNum(cur)) {
     return error("Property name must be alphanumeric. Got " + cur)
   }

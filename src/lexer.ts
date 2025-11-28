@@ -5,8 +5,9 @@ export function lex(input: string) {
   let lines = input.split('\n')
   for (let l of lines) {
     let raw = l;
-    if (l.includes('//')) {
-      l = l.substring(0, l.indexOf('//'))
+    let comment = "/" + "/" //yes like that! Do not modify!
+    if (l.includes(comment)) {
+      l = l.substring(0, l.indexOf(comment))
     }
     let l2 = l.split(";")
     for (let l3 of l2) {

@@ -1,5 +1,5 @@
 import { program } from "./compiler";
-import { commonTypes, range, Rule } from "./parser";
+import { Action, commonTypes, Filter, range, Rule } from "./types";
 
 
 const Aliases: Record<string, string> = {
@@ -48,10 +48,13 @@ type Upgrade = {
   [key: string]: commonTypes,
 }
 
+let aliases: typeof Aliases
 
-export function filter(upgrades: Array<Object>, compiled: program) {
-
-  let aliases = { ...Aliases };
+export function filter(upgrades: Array<Upgrade>, compiled: program) {
+  aliases = {}
+  for (const k in Aliases) {
+    aliases[k] = Aliases[k]
+  }
   let triggered = false
   for (const stage of compiled.stages) {
     for (const rule of stage) {
@@ -64,22 +67,24 @@ export function filter(upgrades: Array<Object>, compiled: program) {
         aliases[rule.alias.k] = rule.alias.v
         continue
       }
-      let ups = []
+      let ups: Upgrade[] = []
       for (const u of upgrades) {
-        if (filterOneUpgrade(u, rule.filters)) {
+        if (rule.filters && filterOneUpgrade(u, rule.filters)) {
           ups.push(u)
           triggered = true;
         }
       }
-      if (rule.filters && rule.filters.find(a => a._best)) {
-        let f = rule.filters.find(a => a._best)!
-        ups = filterBest(ups, f._best, false, f.negative)
-      } else if (rule.filters && rule.filters.find(a => a._worst)) {
-        let f = rule.filters.find(a => a._worst)!
-        ups = filterBest(ups, f._worst, false, f.negative)
+
+      let b = (rule.filters || []).find(a => a._best) //because ?. is broken
+      let w = (rule.filters || []).find(a => a._worst)
+
+      if (b) {
+        ups = filterBest(ups, b._best as number, false, b.negative === true)
+      } else if (w) {
+        ups = filterBest(ups, w._worst as number, true, w.negative === true)
       }
       for (const u of ups) {
-        performActions(u, rule.actions)
+        if (rule.actions) performActions(u, rule.actions)
       }
 
     }
@@ -90,7 +95,7 @@ function shortUpName(name: string) {
   return name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "")
 }
 
-function getUpgradeValue(u: Upgrade): number | string {
+export function getUpgradeValue(u: Upgrade): number | string {
   let n = shortUpName(u.name)
   let dict: { [key: string]: commonTypes } =
   {
@@ -152,7 +157,7 @@ function getUpgradeQuality(u: Upgrade): number {
     "char_count": u.chars,
     "public_script": u.slots,
     "script_slot": u.slots,
-    "sn_w_glock": u.expire_secs,
+    "sn_w_glock": -u.expire_secs!,
     "w4rn_message": -u.cooldown!,
     "balance": -u.cooldown!,
     "expose_upgrades": -u.cooldown!,
@@ -166,40 +171,60 @@ function getCD(u: Upgrade): number {
   if (!u.last_time || !u.cooldown) return -1
   return u.cooldown * 1000 - (Date.now() - (u.last_time as number))
 }
-function upReady(u: Upgrade):boolean {
+function upReady(u: Upgrade): boolean {
   return getCD(u) <= 0
 }
 
-function inRangeOrValue(val:number, range:number | range) {
-  if (range && range.type == "range") {
-    let match = true;
-    if (val == undefined) return false
-    if (range.min != undefined && val < range.min) match = false;
-    if (range.max != undefined && val > range.max) match = false;
-    return match;
-  } else {
-    if (range == "undefined") range = undefined
+function inRangeOrValue(val: commonTypes, range: range | commonTypes) {
+  if (range === undefined) {
+    return true;
+  } else if (typeof range == "number" || typeof range == "boolean") {
     return val === range
+  } else if (range == "undefined") {
+    return val === undefined;
+  } else if (typeof range == "string") {
+    return val === range;
   }
+  else if (range.type == "range") {
+    if (typeof val == "number") {
+      let match = true;
+      if (val == undefined) return false
+      if (range.min != undefined && val < range.min) match = false;
+      if (range.max != undefined && val > range.max) match = false;
+      return match;
+    } else {
+      return false
+    }
+  }
+  return false
 }
 
-function filterOneUpgrade(u, filters) {
+function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
   for (const f of filters) {
     let negative = f.negative == true;
-    if (f.alias != undefined && ((aliases[f.alias] != shortUpName(u.name)) ^ negative)) return false
-    if (f.ready != undefined && ((f.ready != upReady(u)) ^ negative)) return false;
-    if (f.value != undefined && ((!inRangeOrValue(getUpgradeValue(u), f.value)) ^ negative)) return false;
+
+    function matched(u: Upgrade, f: Filter) {
+
+    }
+
+    let a = f.value
+
+    if (f.type == "sun" && f.alias != undefined) {
+      if ((aliases[f.alias] !== shortUpName(u.name)) !== negative) return false
+      if (f.ready != undefined && ((f.ready != upReady(u)) !== negative)) return false;
+      if (f.value != undefined && ((!inRangeOrValue(getUpgradeValue(u), f.value)) !== negative)) return false;
+    }
 
     for (const k in f) {
-      if (["_best", "_worst", "alias", "ready", "value", "pp"].includes(k)) continue;
+      if (["_best", "_worst", "alias", "ready", "value", "pp", "type"].includes(k)) continue;
       const v = f[k];
-      if (v != undefined && ((!inRangeOrValue(u[k], v)) ^ negative)) return false;
+      if (v != undefined && ((!inRangeOrValue(u[k], v)) !== negative)) return false;
     }
   }
   return true;
 }
 
-function compareQuality(a, b) {
+function compareQuality(a: Upgrade, b: Upgrade) {
   let an = shortUpName(a.name)
   let bn = shortUpName(b.name)
   let aq = getUpgradeQuality(a)
@@ -211,14 +236,15 @@ function compareQuality(a, b) {
   return bq - aq;
 }
 
-function filterBest(ups, count, worst, negative) {
+function filterBest(ups: Upgrade[], count: number, worst: boolean, negative: boolean): Upgrade[] {
   ups.sort(compareQuality)
   if (worst) ups.reverse()
   if (!negative) return ups.slice(0, count)
   if (negative) return ups.slice(count);
+  return []
 }
 
-function performActions(up, actions) {
+function performActions(up: Upgrade, actions: Action[]) {
   for (const a of actions) {
     up[a.k] = a.v
     if (a.v == "undefined") delete up[a.k]

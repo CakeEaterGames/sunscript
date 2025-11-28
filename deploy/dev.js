@@ -14,6 +14,14 @@ const watcher = watch('./src', { recursive: true }, async (eventType, filename) 
     await buildBrowserApp(outputPath);
   }
 });
+// Watch for changes in ./src directory
+const watcher2 = watch('./frontend', { recursive: true }, async (eventType, filename) => {
+  if (filename) {
+    console.log(`File ${filename} changed, rebuilding...`);
+    await buildBrowserApp(outputPath);
+  }
+});
+ 
 
 // Start server
 const server = Bun.serve({

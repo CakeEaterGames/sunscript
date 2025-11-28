@@ -1,0 +1,42 @@
+@font-face {
+    font-family: 'WhiteRabbit';
+    src: url('../assets/fonts/whiterabbit-webfont.ttf');
+}
+
+body {
+    font-family: 'WhiteRabbit';
+    font-weight: bold;
+}
+
+
+/* Dark theme scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #2d3748;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #4a5568 transparent;
+}

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SUNSCRIPT</title>
+    <script src="index.js"></script>
+    <script src="dataset.js"></script>
+</head>
+
+<body>
+    <h1>SUNSCRIPT Live Demo</h1>
+
+    <div id="table-container"></div>
+
+    <style>
+
+    </style>
+
+
+
+    <script>
+        let lib = SUN()
+        // console.log(dataset)
+        for (const u of dataset) {
+            u.special = lib.getUpgradeValue(u)
+        }
+
+        let sunscript = `
+alias c = char_count
+c[1400:*] -> keep=true price=1BGC;>   // Keep all char_counts with 1400+ chars 
+c[1000:*] -> sell=true price=100MGC;> // Sell all char_counts with 1000+ chars 
+c         -> cull=true;>              // Destroy all other char_counts
+
+// pp stands for post process. Triggers after all other filters
+// Sell all unloaded char_counts except best 10 
+pp -c keep=true !_best=10 -> keep=undefined sell=true
+pp c _best=1 -> the_best=true //Find the best char_counts and mark it
+pp * keep -> display
+pp * sell -> display
+pp * cull -> display
+`
+        let charFilter = lib.compile(sunscript)
+        lib.filter(dataset,charFilter)
+        dataset = dataset.filter((a)=>a.display)
+
+        function createTable(data, containerId, whitelistColumns = null) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container with id "${containerId}" not found`);
+                return;
+            }
+
+            // Remove existing table
+            const existingTable = container.querySelector('table');
+            if (existingTable) existingTable.remove();
+
+            // Create new table
+            const table = document.createElement('table');
+            // table.style.border = '1px solid';
+            // table.style.borderCollapse = 'collapse';
+            // table.style.fontFamily = 'Arial, sans-serif';
+            // table.style.fontSize = '14px';
+
+            // Get headers with whitelist
+            let headers = [...new Set(data.flatMap(obj => Object.keys(obj)))];
+            if (whitelistColumns && Array.isArray(whitelistColumns)) {
+                headers = []
+                for (const c of whitelistColumns) {
+                    headers.push(c)
+                }
+            }
+
+            if (headers.length === 0) {
+                table.innerHTML = '<tr><td>No data</td></tr>';
+                container.appendChild(table);
+                return;
+            }
+
+            // Create header row
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header.charAt(0).toUpperCase() + header.slice(1);
+                // th.style.border = '1px solid';
+                // th.style.padding = '2px 4px';
+                // th.style.textAlign = 'left';
+                // th.style.fontWeight = 'normal';
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            // Create data rows
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                headers.forEach(header => {
+                    const cell = document.createElement('td');
+                    cell.textContent = item[header] !== undefined ? item[header] : '—';
+                    // cell.style.border = '1px solid';
+                    // cell.style.padding = '2px 4px';
+                    row.appendChild(cell);
+                });
+                table.appendChild(row);
+            });
+
+            container.appendChild(table);
+        }
+
+        // Simple usage:
+        createTable(dataset, 'table-container', ["i", "name", "special","keep","sell","cull","price"])
+    </script>
+
+</body>
+
+</html>
