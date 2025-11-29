@@ -9,7 +9,7 @@ function convertToHM(code, mainFunc, autocomplete) {
 function(context,args){ // ${autocomplete}
   var __main__;
 ${code}
-  return __main__();
+  return __main__(args);
 }
 `
   return template;
