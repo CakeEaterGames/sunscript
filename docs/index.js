@@ -588,7 +588,6 @@
     for (const stage of compiled.stages) {
       dataset = [...upgrades];
       for (const rule of stage) {
-        console.log(rule);
         if (rule.return) {
           dataset = dataset.filter((a) => !a._filtered);
           if (dataset.length == 0)
@@ -806,6 +805,7 @@
   function SUN(args) {
     if (args && args.import === true)
       return { compile, filter, sortUpgrades, getUpgradeValue, getUpgradeQuality, Aliases };
+    let comment = "//";
     let a = `    'J╔══════════════════════════════════════════════════════════════╗'    
     'J║'  cake.sun - Short Upgrade Notation                           'J║'   
     'J╠══════════════════════════════════════════════════════════════╣'    
@@ -814,10 +814,10 @@
     'J║'  'I- O -        A smart filter for your upgrades'               'J║'
     'J║'  'I/ | \\                 Keep it light'                         'J║'
     'J║'                                                              'J║'   
-    'J║'  'IAll info is at https://github.com/CakeEaterGames/sunscript'  'J║'
+    'J║'  'IAll info is at https:` + comment + `github.com/CakeEaterGames/sunscript'  'J║'
     'J║                                                              ║'    
-    'J╚══════════════════════════════════════════════════════════════╝'    `.replace(/'/gm, "`");
-    return a;
+    'J╚══════════════════════════════════════════════════════════════╝'    `;
+    return a.replace(/'/gm, "`");
   }
   window.SUN = SUN;
 })();

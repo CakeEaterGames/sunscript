@@ -62,7 +62,7 @@ export function filter(upgrades: Array<Upgrade>, compiled: program) {
   for (const stage of compiled.stages) {
     dataset = [...upgrades]
     for (const rule of stage) {
-      console.log(rule);
+      // console.log(rule);
 
       if (rule.return) {
         dataset = dataset.filter(a => !a._filtered)
