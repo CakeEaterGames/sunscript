@@ -5,27 +5,60 @@
     <title>SUNSCRIPT</title>
     <script src="index.js"></script>
     <script src="dataset.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script>
+                function createTable(data, containerId, whitelistColumns = null) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`Container with id "${containerId}" not found`);
+                return;
+            }
+            const existingTable = container.querySelector('table');
+            if (existingTable) existingTable.remove();
+            const table = document.createElement('table');
+            table.className = "my_table"
+
+            let headers = [...new Set(data.flatMap(obj => Object.keys(obj)))];
+            if (whitelistColumns && Array.isArray(whitelistColumns)) {
+                headers = []
+                for (const c of whitelistColumns) {
+                    headers.push(c)
+                }
+            }
+            if (headers.length === 0) {
+                table.innerHTML = '<tr><td>No data</td></tr>';
+                container.appendChild(table);
+                return;
+            }
+
+            const headerRow = document.createElement('tr');
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                headers.forEach(header => {
+                    const cell = document.createElement('td');
+                    cell.textContent = item[header] !== undefined ? item[header] : ' ';
+                    row.appendChild(cell);
+                });
+                table.appendChild(row);
+            });
+
+            container.appendChild(table);
+        }
+
+    </script>
 </head>
 
 <body>
     <h1>SUNSCRIPT Live Demo</h1>
 
-    <div id="table-container"></div>
-
-    <style>
-
-    </style>
-
-
-
-    <script>
-        let lib = SUN()
-        // console.log(dataset)
-        for (const u of dataset) {
-            u.special = lib.getUpgradeValue(u)
-        }
-
-        let sunscript = `
+    <textarea class="my_area" name="sun_input" id="sun_input">
 alias c = char_count
 c[1400:*] -> keep=true price=1BGC;>   // Keep all char_counts with 1400+ chars 
 c[1000:*] -> sell=true price=100MGC;> // Sell all char_counts with 1000+ chars 
@@ -38,76 +71,48 @@ pp c _best=1 -> the_best=true //Find the best char_counts and mark it
 pp * keep -> display
 pp * sell -> display
 pp * cull -> display
-`
-        let charFilter = lib.compile(sunscript)
-        lib.filter(dataset,charFilter)
-        dataset = dataset.filter((a)=>a.display)
+    </textarea>
 
-        function createTable(data, containerId, whitelistColumns = null) {
-            const container = document.getElementById(containerId);
-            if (!container) {
-                console.error(`Container with id "${containerId}" not found`);
-                return;
-            }
+    <div id="table-container"></div>
 
-            // Remove existing table
-            const existingTable = container.querySelector('table');
-            if (existingTable) existingTable.remove();
 
-            // Create new table
-            const table = document.createElement('table');
-            // table.style.border = '1px solid';
-            // table.style.borderCollapse = 'collapse';
-            // table.style.fontFamily = 'Arial, sans-serif';
-            // table.style.fontSize = '14px';
 
-            // Get headers with whitelist
-            let headers = [...new Set(data.flatMap(obj => Object.keys(obj)))];
-            if (whitelistColumns && Array.isArray(whitelistColumns)) {
-                headers = []
-                for (const c of whitelistColumns) {
-                    headers.push(c)
-                }
-            }
 
-            if (headers.length === 0) {
-                table.innerHTML = '<tr><td>No data</td></tr>';
-                container.appendChild(table);
-                return;
-            }
-
-            // Create header row
-            const headerRow = document.createElement('tr');
-            headers.forEach(header => {
-                const th = document.createElement('th');
-                th.textContent = header.charAt(0).toUpperCase() + header.slice(1);
-                // th.style.border = '1px solid';
-                // th.style.padding = '2px 4px';
-                // th.style.textAlign = 'left';
-                // th.style.fontWeight = 'normal';
-                headerRow.appendChild(th);
-            });
-            table.appendChild(headerRow);
-
-            // Create data rows
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                headers.forEach(header => {
-                    const cell = document.createElement('td');
-                    cell.textContent = item[header] !== undefined ? item[header] : '—';
-                    // cell.style.border = '1px solid';
-                    // cell.style.padding = '2px 4px';
-                    row.appendChild(cell);
-                });
-                table.appendChild(row);
-            });
-
-            container.appendChild(table);
+    <script>
+        let lib = SUN()
+        // console.log(dataset)
+        for (const u of dataset) {
+            u.special = lib.getUpgradeValue(u)
         }
 
-        // Simple usage:
-        createTable(dataset, 'table-container', ["i", "name", "special","keep","sell","cull","price"])
-    </script>
+        let timeoutId;
+        let textarea = document.getElementById('sun_input');
+        textarea.addEventListener('input', function () {
+            // Clear previous timeout
+            clearTimeout(timeoutId);
+
+            // Set new timeout
+            timeoutId = setTimeout(() => {
+                recompile()
+            }, 1000); // 1 second delay
+        });
+
+        var displayed = []
+        function recompile() {
+            displayed = JSON.parse(JSON.stringify(dataset))
+            
+            let charFilter = lib.compile(textarea.value)
+            lib.filter(displayed, charFilter)
+            displayed = displayed.filter((a) => a.display)
+
+            createTable(displayed, 'table-container', ["i", "the_best", "name", "special", "keep", "sell", "cull", "price"])
+
+        }
+
+
+
+
+      </script>
 
 </body>
 
