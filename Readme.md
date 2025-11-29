@@ -12,12 +12,6 @@ Sunscript is Domain Specific Language ([DSL](https://en.wikipedia.org/wiki/Domai
 
 The more you use it the more readable and comfortable it becomes!
 
-```js
-upgrades.filter((a)=>{return a.chars>=1000})
-// can be replaced with just
-// c[1000:*]
-```
-
 ## Usage
 
 ```js
