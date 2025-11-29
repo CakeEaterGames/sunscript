@@ -6,7 +6,7 @@ function SUN(args: any) {
   
   //This is quite ugly but trust me, it looks aligned in the game
   //If anyone knows how to make this cleaner while not taking to many crars, let me know
-  
+  let comment = "//"
   let a =
     `    'J╔══════════════════════════════════════════════════════════════╗'    
     'J║'  cake.sun - Short Upgrade Notation                           'J║'   
@@ -16,9 +16,9 @@ function SUN(args: any) {
     'J║'  'I- O -        A smart filter for your upgrades'               'J║'
     'J║'  'I/ | \\                 Keep it light'                         'J║'
     'J║'                                                              'J║'   
-    'J║'  'IAll info is at https:\/\/github.com/CakeEaterGames/sunscript'  'J║'
+    'J║'  'IAll info is at https:`+comment+`github.com/CakeEaterGames/sunscript'  'J║'
     'J║                                                              ║'    
-    'J╚══════════════════════════════════════════════════════════════╝'    `.replace(/'/gm, "`")
-  return a;
+    'J╚══════════════════════════════════════════════════════════════╝'    `
+  return a.replace(/'/gm, "`");
 }
 (window as any).SUN = SUN;
