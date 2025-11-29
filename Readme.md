@@ -15,7 +15,7 @@ The more you use it the more readable and comfortable it becomes!
 ## Usage
 
 ```js
-const SUN = #fs.cake.sun()
+const SUN = #fs.cake.sun_v0({import:true})
 const CharCountFilter = SUN.compile(`
 	alias c = char_count
 	c[1500:*] -> keep price=10BGC;>    // Keep all char_counts with 1400+ chars 
@@ -26,7 +26,7 @@ const CharCountFilter = SUN.compile(`
 	pp c keep !the_best -> sell keep=undefined    // Only keep the best 3
 	pp _filtered -> display            // Display all upgrades touched by the filter 
 `)
-const filtered = SUN.filter(upgrages, CharCountFilter)
+const filtered = SUN.filter(upgrades, CharCountFilter)
 // "filtered" will contain all items of array "upgrades" that triggered at least one rule in the list.
 // Array items now have additional properties: keep, sell, cull, price, the_best, _filtered, display
 let keep = upgrades.filter(a=>a.keep)
@@ -34,7 +34,7 @@ let sell = upgrades.filter(a=>a.sell)
 let cull = upgrades.filter(a=>a.cull)
 ```
 
-Use #fs.cake.sun()
+Use #fs.cake.sun_v0({import:true})
 Or download it from the dist folder
 
 ## Use cases for SUNSCRIPT
@@ -306,7 +306,7 @@ function getUpgradeValue(u) {
 
 ## Samples
 
-WIP
+Wind the working samples in the "samples" dir
 
 ## Contribute
 
