@@ -1,32 +1,16 @@
 # SUNSCRIPT - Short Upgrade Notation
 
-## Usage
+## ATTENTION!
 
-```js
-const SUN = #fs.cake.sun()
-const CharCountFilter = SUN.compile(`
-	alias c = char_count
-	c[1400:*] -> keep=true price=1BGC;>   // Keep all char_counts with 1400+ chars 
-	c[1000:*] -> sell=true price=100MGC;> // Sell all char_counts with 1000+ chars 
-	c         -> cull=true;>              // Destroy all other char_counts
-	
-	// pp stands for post process. Triggers after all other filters
-	// Sell all unloaded char_counts except best 10 
-	pp -c keep=true !_best=10 -> keep=undefined sell=true
-	pp c _best=1 -> the_best=true //Find the best char_counts and mark it
-`)
-const filtered = SUN.filter(upgrages, CharCountFilter)
-// "filtered" will contain all items of array "upgrades" that triggered at least one rule in the list.
-// Array items now have additional properties: keep, sell, cull, price, the_best
-```
-
-Or if you want to, you can download the script from this repo and upload it yourself! If you want to change something or if you want to keep your code dependency-free!
+While this repo is still in development, you can submit bug reports for 2BGC each! 
+And in general, if you'll do something cool with sunscript, I will give you GC!
+Have fun everyone
 
 ## Introduction
 
 Sunscript is Domain Specific Language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) for an MMO game called [Hackmud](https://hackmud.com). It is designed to solve one and only one specific problem in the game, **filtering of loot (upgrades)**. When you get to a certain progression point at the game you start to acquire thousands of individual items of various rarities, tiers, types and qualities. Deciding what to do with each individual item by hand is no longer possible and any attempt to create a proper filtering solution ends up becomes a long list of "if else" statements that is very difficult to read and modify.
 
-The more you use it the more readable it becomes and in result it becomes a lot more comfortable than js filter functions.
+The more you use it the more readable and comfortable it becomes!
 
 ```js
 upgrades.filter((a)=>{return a.chars>=1000})
@@ -34,13 +18,39 @@ upgrades.filter((a)=>{return a.chars>=1000})
 // c[1000:*]
 ```
 
+## Usage
+
+```js
+const SUN = #fs.cake.sun()
+const CharCountFilter = SUN.compile(`
+	alias c = char_count
+	c[1500:*] -> keep price=10BGC;>    // Keep all char_counts with 1400+ chars 
+	c[1460:*] -> sell price=1BGC;>     // Sell all char_counts with 1000+ chars
+	c         -> cull;>                // Destroy all other char_counts
+
+	pp c keep _best=3 -> the_best     
+	pp c keep !the_best -> sell keep=undefined    // Only keep the best 3
+	pp _filtered -> display            // Display all upgrades touched by the filter 
+`)
+const filtered = SUN.filter(upgrages, CharCountFilter)
+// "filtered" will contain all items of array "upgrades" that triggered at least one rule in the list.
+// Array items now have additional properties: keep, sell, cull, price, the_best, _filtered, display
+let keep = upgrades.filter(a=>a.keep)
+let sell = upgrades.filter(a=>a.sell)
+let cull = upgrades.filter(a=>a.cull)
+```
+
+Use #fs.cake.sun()
+Or download it from the dist folder
+
 ## Use cases for SUNSCRIPT
 
 SUNSCRIPT can be used as:
 - A querry language for finding upgrades in your inventories
 - A grading system that can assign a cost to an item
 - A decider that marks upgrades to be Sold / Destroyed / Stored
-- A router that sends upgrades to your Stash user / Weaver user / Wolf user 
+- A router that sends upgrades to your Stash user / Weaver user / Wolf user
+
 SUNSCRIPT CAN'T be used as:
 - A general purpose language. (I dare you to write Fibonacci in it tho. I'll give 50BGC if you do) 
 - A full replacement of your logic. It will get you 90% of the way there, but you'll still need to do the final steps yourself.
@@ -161,7 +171,8 @@ Building blocks of a sun rule:
 - ALIAS (required) A single character that defines an upgrade. See a table of Aliases
 - TIER (optional) A single numeric digit. Tier of upgrade
 - Rarity (optional) A single numeric digit. Rarity of upgrade. Can only be present if a tier is specified or set to '\*'
-- [VALUE] (optional) pair of square brackets surrounding a Value or a Range. Defines the main value of upgrade. For char_counts it is property "chars" for script_slot it is property "slots". See a table of defining Values 
+- [VALUE] (optional) pair of square brackets surrounding a Value or a Range. Defines the main value of upgrade. For char_counts it is property "chars" for script_slot it is property "slots". See a table of defining Values.
+
 You can chain these blocks in the order they are mentioned to create short but powerful rules. Here are some example SUN filters:
 ```
 c         // All char_counts
@@ -190,7 +201,6 @@ c[1000:*] good=true // A combination of previous filter with a LUN filter
 #### Return statement
 
 '>' is a special command that means "stop filtering if any of the previous filters got triggered"
-From the example on top of the page
 ```
 c[1400:*] -> keep=true price=1BGC
 > //return if item is meant to be kept
@@ -205,7 +215,7 @@ c -> cull=true
 S[4] -> keep=true;> //keep public_scripts with 4 slots
 ```
 
-#### Post processing
+#### Postprocessing
 
 Keyword 'pp' stands for postprocessing. You can prefix your Rules with 'pp' to say that the rule should be executed after all the non pp rules got executed. If the script finished or '>' keyword got triggered, the pp rules will start executing in the order they are written. You can place pp rules between non pp rules.
 
@@ -302,9 +312,8 @@ function getUpgradeValue(u) {
 
 ## Samples
 
-You can find samples in the samples directory of this repo.
+WIP
 
 ## Contribute
 
 If you want to contribute you can fork this repository and create a merge request. Or find me on discord in the official Hackmud server. Suggestions are always appreciated.
-

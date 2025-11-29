@@ -3,7 +3,14 @@ import { Action, Alias, commonTypes, LUNFilter, range, Rule, SUNFilter } from ".
 import { isAlphaNum } from "./utils"
 
 
+/*
+c[1500:*] -> keep price=10BGC;>
+c[1400:*] -> sell price=1BGC;>
+c -> cull;>
 
+pp c keep _best=3 -> the_best
+pp c -> display
+*/
 
 type savestate = {
   cur: string,
@@ -65,7 +72,6 @@ function save() {
 }
 
 function load(a: savestate) {
-  stackLog(" =========== Load triggered")
   curI = a.curI
   cur = a.cur
 }
@@ -344,7 +350,7 @@ function parseSUN(): response<SUNFilter> {
       r.alias = cur[0]
       if (!isNaN(Number(cur[1]))) r.tier = Number(cur[1])
       advance()
-      if (cur!=" " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+      if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
         r.rarity = Number(cur);
         advance()
       }
@@ -352,11 +358,11 @@ function parseSUN(): response<SUNFilter> {
     case 1: {
       r.alias = cur[0]
       advance()
-      if (cur!=" " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+      if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
         r.tier = Number(cur);
         advance()
       }
-      if (cur!=" " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+      if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
         r.rarity = Number(cur);
         advance()
       }
@@ -365,8 +371,8 @@ function parseSUN(): response<SUNFilter> {
     default: return error("SUN Rule Error. Expected an alias char, but got " + cur);
   }
 
-  if(r.alias=="*") r.alias = undefined;
- 
+  if (r.alias == "*") r.alias = undefined;
+
 
   if (cur == "[") {
     consume("[")
@@ -410,7 +416,9 @@ function parseLUN(): response<LUNFilter> {
   }
   let name = cur;
   advance()
+  let s = save()
   skipSpaces()
+
   if (cur == '=') {
     let c = consume("=")
     if (c.type == "error") return c;
@@ -419,13 +427,20 @@ function parseLUN(): response<LUNFilter> {
     if (v.type == "error") return v
     res[name] = v.value;
     return resp(res)
-  } else if ([" ", ";", "->", "!"].includes(cur)) {
-    skipSpaces()
-    res[name] = true;
-    return resp(res)
   } else {
-    return error("Failed to parse LUN. Expected = or ; or -> or ! or space. Got " + cur)
+    //We either found a short lun filter without "=true"
+    //Or a syntax error
+
+    if ([";", "->", "!"].includes(cur) || isAlphaNum(cur)) {
+      res[name] = true;
+      return resp(res)
+    } else {
+      return error("Failed to parse LUN. Expected = or ; or -> or ! or space. Got " + cur)
+    }
+
   }
+
+
 }
 
 function parseValue(): response<range | commonTypes> {

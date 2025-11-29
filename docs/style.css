@@ -1,0 +1,79 @@
+@font-face {
+    font-family: 'WhiteRabbit';
+    src: url('./assets/fonts/whiterabbit-webfont.ttf');
+}
+
+body {
+    font-family: 'WhiteRabbit';
+    font-weight: bold;
+
+    background: repeating-linear-gradient(180deg, #0e0e0e, #0e0e0e .2em, #101215 .2em, #101215 .4em);
+    color: #7AB2F4;
+}
+
+
+/* Dark theme scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #2d3748;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #4a5568 transparent;
+}
+
+
+
+
+
+
+
+
+
+
+.my_table {
+  border: 1px solid;
+  border-collapse: collapse;
+  padding: 2px;
+}
+.my_table td {
+  border: 1px solid;
+  padding: 2px;
+}
+.my_table th {
+  border: 1px solid;
+  padding: 2px;
+}
+
+
+
+
+
+.my_area {
+  width: 100%;
+  min-height: 100px;
+  background-color: #2d3748;
+  color: #7AB2F4;
+}

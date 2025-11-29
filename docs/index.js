@@ -130,7 +130,6 @@
     return { curI, cur };
   }
   function load(a) {
-    stackLog(" =========== Load triggered");
     curI = a.curI;
     cur = a.cur;
   }
@@ -378,7 +377,7 @@
           if (!isNaN(Number(cur[1])))
             r.tier = Number(cur[1]);
           advance();
-          if ((cur + "").length == 1 && !isNaN(Number(cur))) {
+          if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
             r.rarity = Number(cur);
             advance();
           }
@@ -388,11 +387,11 @@
         {
           r.alias = cur[0];
           advance();
-          if ((cur + "").length == 1 && !isNaN(Number(cur))) {
+          if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
             r.tier = Number(cur);
             advance();
           }
-          if ((cur + "").length == 1 && !isNaN(Number(cur))) {
+          if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
             r.rarity = Number(cur);
             advance();
           }
@@ -401,6 +400,8 @@
       default:
         return error("SUN Rule Error. Expected an alias char, but got " + cur);
     }
+    if (r.alias == "*")
+      r.alias = undefined;
     if (cur == "[") {
       consume("[");
       let v = parseValue();
@@ -438,6 +439,7 @@
     }
     let name = cur;
     advance();
+    let s = save();
     skipSpaces();
     if (cur == "=") {
       let c = consume("=");
@@ -449,12 +451,13 @@
         return v;
       res[name] = v.value;
       return resp(res);
-    } else if ([" ", ";", "->", "!"].includes(cur)) {
-      skipSpaces();
-      res[name] = true;
-      return resp(res);
     } else {
-      return error("Failed to parse LUN. Expected = or ; or -> or ! or space. Got " + cur);
+      if ([";", "->", "!"].includes(cur) || isAlphaNum(cur)) {
+        res[name] = true;
+        return resp(res);
+      } else {
+        return error("Failed to parse LUN. Expected = or ; or -> or ! or space. Got " + cur);
+      }
     }
   }
   function parseValue() {
@@ -575,6 +578,7 @@
     r: "w4rn_er"
   };
   var aliases;
+  var dataset;
   function filter(upgrades, compiled) {
     aliases = {};
     for (const k in Aliases) {
@@ -582,17 +586,21 @@
     }
     let triggered = false;
     for (const stage of compiled.stages) {
+      dataset = [...upgrades];
       for (const rule of stage) {
         console.log(rule);
-        if (rule.return && triggered) {
-          break;
+        if (rule.return) {
+          dataset = dataset.filter((a) => !a._filtered);
+          if (dataset.length == 0)
+            break;
+          continue;
         }
         if (rule.alias) {
           aliases[rule.alias.k] = rule.alias.v;
           continue;
         }
         let ups = [];
-        for (const u of upgrades) {
+        for (const u of dataset) {
           if (rule.filters && filterOneUpgrade(u, rule.filters)) {
             ups.push(u);
             triggered = true;
@@ -600,14 +608,16 @@
         }
         let b = (rule.filters || []).find((a) => a._best);
         let w = (rule.filters || []).find((a) => a._worst);
-        if (b) {
+        if (b && typeof b._best == "number") {
           ups = filterBest(ups, b._best, false, b.negative === true);
-        } else if (w) {
+        } else if (w && typeof w._worst == "number") {
           ups = filterBest(ups, w._worst, true, w.negative === true);
         }
         for (const u of ups) {
-          if (rule.actions)
+          u._filtered = true;
+          if (rule.actions) {
             performActions(u, rule.actions);
+          }
         }
       }
     }
@@ -775,10 +785,39 @@
         delete up[a.k];
     }
   }
+  function sortUpgrades(ups) {
+    return ups.sort((a, b) => {
+      if (a.name != b.name)
+        return a.name.localeCompare(b.name);
+      let q = compareQuality(a, b);
+      if (q != 0)
+        return q;
+      if (a.tier != b.tier)
+        return b.tier - a.tier;
+      if (a.rarity != b.rarity)
+        return b.rarity - a.rarity;
+      if (a.loaded != b.loaded)
+        return b.loaded ? 1 : 0;
+      return 0;
+    });
+  }
 
   // src/index.ts
-  function SUN() {
-    return { compile, filter };
+  function SUN(args) {
+    if (args && args.import === true)
+      return { compile, filter, sortUpgrades, getUpgradeValue, getUpgradeQuality, Aliases };
+    let a = `    'J╔══════════════════════════════════════════════════════════════╗'    
+    'J║'  cake.sun - Short Upgrade Notation                           'J║'   
+    'J╠══════════════════════════════════════════════════════════════╣'    
+    'J║'                                                              'J║'   
+    'J║'  'I\\ | /                -= SUNSCRIPT =-'                        'J║'
+    'J║'  'I- O -        A smart filter for your upgrades'               'J║'
+    'J║'  'I/ | \\                 Keep it light'                         'J║'
+    'J║'                                                              'J║'   
+    'J║'  'IAll info is at https://github.com/CakeEaterGames/sunscript'  'J║'
+    'J║                                                              ║'    
+    'J╚══════════════════════════════════════════════════════════════╝'    `.replace(/'/gm, "`");
+    return a;
   }
   window.SUN = SUN;
 })();

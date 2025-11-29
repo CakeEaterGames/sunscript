@@ -2,7 +2,7 @@ import { program } from "./compiler";
 import { Action, commonTypes, Filter, range, Rule } from "./types";
 
 
-const Aliases: Record<string, string> = {
+export const Aliases: Record<string, string> = {
   "x": "l0ckbox",
   "j": "l0ckjaw",
   "q": "l0cket",
@@ -50,6 +50,9 @@ type Upgrade = {
 
 let aliases: typeof Aliases
 
+
+let dataset: Upgrade[];
+
 export function filter(upgrades: Array<Upgrade>, compiled: program) {
   aliases = {}
   for (const k in Aliases) {
@@ -57,18 +60,21 @@ export function filter(upgrades: Array<Upgrade>, compiled: program) {
   }
   let triggered = false
   for (const stage of compiled.stages) {
+    dataset = [...upgrades]
     for (const rule of stage) {
       console.log(rule);
 
-      if (rule.return && triggered) {
-        break;
+      if (rule.return) {
+        dataset = dataset.filter(a => !a._filtered)
+        if (dataset.length == 0) break;
+        continue;
       }
       if (rule.alias) {
         aliases[rule.alias.k] = rule.alias.v
         continue
       }
       let ups: Upgrade[] = []
-      for (const u of upgrades) {
+      for (const u of dataset) {
         if (rule.filters && filterOneUpgrade(u, rule.filters)) {
           ups.push(u)
           triggered = true;
@@ -78,13 +84,16 @@ export function filter(upgrades: Array<Upgrade>, compiled: program) {
       let b = (rule.filters || []).find(a => a._best) //because ?. is broken
       let w = (rule.filters || []).find(a => a._worst)
 
-      if (b) {
-        ups = filterBest(ups, b._best as number, false, b.negative === true)
-      } else if (w) {
-        ups = filterBest(ups, w._worst as number, true, w.negative === true)
+      if (b && typeof b._best == "number") {
+        ups = filterBest(ups, b._best, false, b.negative === true)
+      } else if (w && typeof w._worst == "number") {
+        ups = filterBest(ups, w._worst, true, w.negative === true)
       }
       for (const u of ups) {
-        if (rule.actions) performActions(u, rule.actions)
+        u._filtered = true;
+        if (rule.actions) {
+          performActions(u, rule.actions)
+        }
       }
 
     }
@@ -130,7 +139,7 @@ export function getUpgradeValue(u: Upgrade): number | string {
   return 0;
 }
 
-function getUpgradeQuality(u: Upgrade): number {
+export function getUpgradeQuality(u: Upgrade): number {
   let n = shortUpName(u.name)
   if (n == "k3y") {
     if (u.rarity == 0) return 3;
@@ -224,7 +233,7 @@ function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
   return true;
 }
 
-function compareQuality(a: Upgrade, b: Upgrade) {
+export function compareQuality(a: Upgrade, b: Upgrade) {
   let an = shortUpName(a.name)
   let bn = shortUpName(b.name)
   let aq = getUpgradeQuality(a)
@@ -253,3 +262,15 @@ function performActions(up: Upgrade, actions: Action[]) {
 
 
 
+export function sortUpgrades(ups: Upgrade[]) {
+  return ups.sort((a: Upgrade, b: Upgrade) => {
+    if (a.name != b.name) return a.name.localeCompare(b.name)
+    let q = compareQuality(a, b)
+    if (q != 0) return q;
+    if (a.tier != b.tier) return b.tier - a.tier
+    if (a.rarity != b.rarity) return b.rarity - a.rarity
+    if (a.loaded != b.loaded) return b.loaded ? 1 : 0;
+
+    return 0
+  })
+}
