@@ -562,7 +562,6 @@ function(context,args){ //
         res.stages.push(stage);
       }
     }
-    console.log(res);
     return res;
   }
 
