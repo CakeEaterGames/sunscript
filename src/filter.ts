@@ -3,41 +3,41 @@ import { Action, commonTypes, Filter, range, Rule } from "./types";
 
 
 export const Aliases: Record<string, string> = {
-  "l0ckbox": "x",
-  "l0ckjaw": "j",
-  "l0cket": "q",
-  "acct_nt": "a",
-  "magnara": "m",
-  "l0g_wr1t3r": "W",
-  "sn_w_usac": "o",
-  "shfflr": "f",
-  "CON_TELL": "N",
-  "CON_SPEC": "n",
-  "DATA_CHECK": "D",
-  "sn_w_glock": "g",
-  "ez_21": "2",
-  "ez_35": "3",
-  "ez_40": "4",
-  "c001": "X",
-  "c002": "y",
-  "c003": "Y",
-  "cron_bot": "C",
-  "char_count": "c",
-  "script_slot": "s",
-  "public_script": "S",
-  "channel_count": "0",
-  "k3y": "k",
-  "balance": "b",
-  "log_writer": "w",
-  "transactions": "t",
-  "transfer": "T",
-  "expose_upgrades": "u",
-  "transfer_upgrade": "U",
-  "expose_access_log": "l",
-  "expose_upgrade_log": "L",
-  "w4rn": "z",
-  "w4rn_message": "Z",
-  "w4rn_er": "r"
+  "x":"l0ckbox",
+  "j":"l0ckjaw",
+  "q":"l0cket",
+  "a":"acct_nt",
+  "m":"magnara",
+  "W":"l0g_wr1t3r",
+  "o":"sn_w_usac",
+  "f":"shfflr",
+  "N":"CON_TELL",
+  "n":"CON_SPEC",
+  "D":"DATA_CHECK",
+  "g":"sn_w_glock",
+  "2":"ez_21",
+  "3":"ez_35",
+  "4":"ez_40",
+  "X":"c001",
+  "y":"c002",
+  "Y":"c003",
+  "C":"cron_bot",
+  "c":"char_count",
+  "s":"script_slot",
+  "S":"public_script",
+  "0":"channel_count",
+  "k":"k3y",
+  "b":"balance",
+  "w":"log_writer",
+  "t":"transactions",
+  "T":"transfer",
+  "u":"expose_upgrades",
+  "U":"transfer_upgrade",
+  "l":"expose_access_log",
+  "L":"expose_upgrade_log",
+  "z":"w4rn",
+  "Z":"w4rn_message",
+  "r":"w4rn_er",
 };
 
 type Upgrade = {
@@ -214,7 +214,7 @@ function inRangeOrValue(val: commonTypes, range: range | commonTypes) {
 
 function matchAlias(u: Upgrade, alias: string) {
   let n = shortUpName(u.name)
-  if (aliases[n] == alias) return true;
+  if (aliases[alias] == n) return true;
   return false
 }
 

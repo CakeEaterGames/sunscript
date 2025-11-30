@@ -51,6 +51,7 @@ alias S = char_count
 alias S = channel_count
 alias S = expose_access_log
 S10 -> snack keep;>
+
 #1 snack _best=128 -> the_best
 //Only keep 128 snax
 
@@ -256,153 +257,153 @@ k extra -> sell
 
 
 //Price list
-#1 *1 !name=k3y !snack -> 0GC
+#1 *1 !name=k3y !snack -> price=0GC
 #1 snack -> price=10MGC
 
 
 
 
 
-#1 alias x = acct_nt
-#1 x[12:*] -> price=100BGC barter;>
-#1 x[11:*] -> price=10BGC barter;>
-#1 x[10:*] -> price=1BGC barter;>
-#1 x[9:*] -> price=100MGC;>
-#1 x[8:*] -> price=10MGC;>
-#1 x->cull;>
+#2 alias x = acct_nt
+#2 x[12:*] -> price=100BGC barter;>
+#2 x[11:*] -> price=10BGC barter;>
+#2 x[10:*] -> price=1BGC barter;>
+#2 x[9:*] -> price=100MGC;>
+#2 x[8:*] -> price=10MGC;>
+#2 x -> cull;>
 
-#1 alias x = l0ckbox
-#1 x[27:*] -> price=100BGC barter;>
-#1 x[26:*] -> price=100MGC;>
-#1 x[25:*] -> price=10MGC;>
-#1 x->cull;>
+#2 alias x = l0ckbox
+#2 x[27:*] -> price=100BGC barter;>
+#2 x[26:*] -> price=100MGC;>
+#2 x[25:*] -> price=10MGC;>
+#2 x -> cull;>
 
-#1 alias x = magnara
-#1 x[9:*] -> price=500BGC barter;>
-#1 x[8:*] -> price=10BGC barter;>
-#1 x[7:*] -> price=10MGC;>
-#1 x->cull;>
+#2 alias x = magnara
+#2 x[9:*] -> price=500BGC barter;>
+#2 x[8:*] -> price=10BGC barter;>
+#2 x[7:*] -> price=10MGC;>
+#2 x -> cull;>
 
-#1 alias x = sn_w_glock
-#1 x[*:40] -> price=100BGC barter;>
-#1 x[*:50] -> price=10BGC barter;>
-#1 x[*:60] -> price=1BGC barter;>
-#1 x[*:80] -> price=100MGC;>
-#1 x[*:100] -> price=10MGC;>
-#1 x->cull;>
+#2 alias x = sn_w_glock
+#2 x[*:40] -> price=100BGC barter;>
+#2 x[*:50] -> price=10BGC barter;>
+#2 x[*:60] -> price=1BGC barter;>
+#2 x[*:80] -> price=100MGC;>
+#2 x[*:100] -> price=10MGC;>
+#2 x -> cull;>
 
-#1 alias x = CON_SPEC
-#1 x*3 -> price=10MGC;>
-#1 x->cull;>
+#2 alias x = CON_SPEC
+#2 x*3 -> price=10MGC;>
+#2 x -> cull;>
 
-#1 alias x = l0ckjaw
-#1 x[36:*] -> price=100BGC barter;>
-#1 x[37:*] -> price=2BGC;>
-#1 x->cull;>
+#2 alias x = l0ckjaw
+#2 x[36:*] -> price=100BGC barter;>
+#2 x[37:*] -> price=2BGC;>
+#2 x -> cull;>
 
-#1 alias x = l0g_wr1t3r
-#1 x[4:*] -> price=1TGC barter;>
-#1 x[3:*] -> price=250BGC barter;>
-#1 x[2:*] -> price=50BGC barter;>
-#1 x[1:*] -> price=2BGC;>
-#1 x->cull;>
+#2 alias x = l0g_wr1t3r
+#2 x[4:*] -> price=1TGC barter;>
+#2 x[3:*] -> price=250BGC barter;>
+#2 x[2:*] -> price=50BGC barter;>
+#2 x[1:*] -> price=2BGC;>
+#2 x -> cull;>
 
-#1 alias x = sn_w_usac
-#1 x -> price=2BGC
-#1 x->cull;>
+#2 alias x = sn_w_usac
+#2 x -> price=2BGC
+#2 x -> cull;>
 
-#1 alias x = shfflr
-#1 x[7:*] -> price=80BGC barter;>
-#1 x[6] -> price=40BGC barter;>
-#1 x[5] -> price=20BGC barter;>
-#1 x[4] -> price=10BGC barter;>
-#1 x[3] -> price=5BGC
-#1 x[2] -> price=2BGC
-#1 x->cull;>
+#2 alias x = shfflr
+#2 x[7:*] -> price=80BGC barter;>
+#2 x[6] -> price=40BGC barter;>
+#2 x[5] -> price=20BGC barter;>
+#2 x[4] -> price=10BGC barter;>
+#2 x[3] -> price=5BGC
+#2 x[2] -> price=2BGC
+#2 x -> cull;>
 
-#1 alias x = DATA_CHECK
-#1 x4 rarity=2:* -> price=1TGC barter;>
-#1 x4 -> price=500BGC;
-#1 x->cull;>
+#2 alias x = DATA_CHECK
+#2 x4 rarity=2:* -> price=1TGC barter;>
+#2 x4 -> price=500BGC;
+#2 x -> cull;>
 
-#1 alias x = cron_bot
-#1 x2[*:300] -> price=1TMGC barter;>
-#1 x2[*:400] -> price=500BGC barter;>
-#1 x2[*:500] -> price=100BGC barter;>
-#1 x2[*:600] -> price=10BGC barter;>
-#1 x2[*:700] -> price=1BGC;>
-#1 x2[*:800] -> price=100MGC;>
-#1 x2[*:900] -> price=10MGC;>
-#1 x3 -> price=2BGC;>
-#1 x->cull;>
+#2 alias x = cron_bot
+#2 x2[*:300] -> price=1TMGC barter;>
+#2 x2[*:400] -> price=500BGC barter;>
+#2 x2[*:500] -> price=100BGC barter;>
+#2 x2[*:600] -> price=10BGC barter;>
+#2 x2[*:700] -> price=1BGC;>
+#2 x2[*:800] -> price=100MGC;>
+#2 x2[*:900] -> price=10MGC;>
+#2 x3 -> price=2BGC;>
+#2 x -> cull;>
 
-#1 alias x = char_count
-#1 x2[1900:*] -> price=500BGC barter;>
-#1 x2[1800:*] -> price=100BGC barter;>
-#1 x2[1700:*] -> price=50BGC barter;>
-#1 x2[1600:*] -> price=5BGC;>
-#1 x2[1500:*] -> price=500MGC;>
-#1 x2[1400:*] -> price=50MGC;>
+#2 alias x = char_count
+#2 x2[1900:*] -> price=500BGC barter;>
+#2 x2[1800:*] -> price=100BGC barter;>
+#2 x2[1700:*] -> price=50BGC barter;>
+#2 x2[1600:*] -> price=5BGC;>
+#2 x2[1500:*] -> price=500MGC;>
+#2 x2[1400:*] -> price=50MGC;>
 
-#1 x3[1200:*] -> price=2BGC;>
+#2 x3[1200:*] -> price=2BGC;>
 
-#1 x->cull;>
+#2 x -> cull;>
 
-#1 alias x = script_slot
-#1 x[6:*] -> price=1TGC barter;>
-#1 x[5] -> price=100BGC barter;>
-#1 x[4] -> price=10BGC barter;>
-#1 x[3] -> price=100MGC;>
-#1 x->cull;>
+#2 alias x = script_slot
+#2 x[6:*] -> price=1TGC barter;>
+#2 x[5] -> price=100BGC barter;>
+#2 x[4] -> price=10BGC barter;>
+#2 x[3] -> price=100MGC;>
+#2 x -> cull;>
 
-#1 alias x = public_script
-#1 x[6:*] -> price=1TGC barter;>
-#1 x[5] -> price=100BGC barter;>
-#1 x[4] -> price=10BGC barter;>
-#1 x[3] -> price=100MGC;>
-#1 x->cull;>
+#2 alias x = public_script
+#2 x[6:*] -> price=1TGC barter;>
+#2 x[5] -> price=100BGC barter;>
+#2 x[4] -> price=10BGC barter;>
+#2 x[3] -> price=100MGC;>
+#2 x -> cull;>
 
-#1 alias x = channel_count
-#1 x[6:*] -> price=1TGC barter;>
-#1 x[5] -> price=100BGC barter;>
-#1 x[4] -> price=10BGC barter;>
-#1 x[3] -> price=100MGC;>
-#1 x->cull;>
+#2 alias x = channel_count
+#2 x[6:*] -> price=1TGC barter;>
+#2 x[5] -> price=100BGC barter;>
+#2 x[4] -> price=10BGC barter;>
+#2 x[3] -> price=100MGC;>
+#2 x -> cull;>
 
-#1 alias x = balance
-#1 x*4 -> price=1TGC barter;>
-#1 x -> price=1MGC;>
-#1 x->cull;>
+#2 alias x = balance
+#2 x*4 -> price=1TGC barter;>
+#2 x -> price=1MGC;>
+#2 x -> cull;>
 
-#1 alias x = log_writer
-#1 x -> price=1MGC;>
-#1 x->cull;>
+#2 alias x = log_writer
+#2 x -> price=1MGC;>
+#2 x -> cull;>
 
-#1 alias x = transactions
-#1 x -> price=1MGC;>
-#1 x->cull;>
+#2 alias x = transactions
+#2 x -> price=1MGC;>
+#2 x -> cull;>
 
-#1 alias x = transfer
-#1 x -> price=1MGC;>
-#1 x->cull;>
+#2 alias x = transfer
+#2 x -> price=1MGC;>
+#2 x -> cull;>
 
-#1 alias x = expose_upgrades
-#1 x -> price=1MGC;>
-#1 x->cull;>
+#2 alias x = expose_upgrades
+#2 x -> price=1MGC;>
+#2 x -> cull;>
 
-#1 alias x = transfer_upgrade
-#1 x[3:*] -> price=500BGC barter;>
-#1 x[2:*] -> price=25BGC barter;>
-#1 x[1:*] -> price=2BGC;>
-#1 x->cull;>
+#2 alias x = transfer_upgrade
+#2 x[3:*] -> price=500BGC barter;>
+#2 x[2:*] -> price=25BGC barter;>
+#2 x[1:*] -> price=2BGC;>
+#2 x -> cull;>
 
-#1 alias x = expose_access_log
-#1 x -> price=1MGC;>
-#1 x->cull;>
+#2 alias x = expose_access_log
+#2 x -> price=1MGC;>
+#2 x -> cull;>
 
-#1 alias x = expose_upgrade_log
-#1 x -> price=1MGC;>
-#1 x->cull;>
+#2 alias x = expose_upgrade_log
+#2 x -> price=1MGC;>
+#2 x -> cull;>
 
 
 
@@ -418,67 +419,67 @@ k extra -> sell
 
 
 //Key prices
-#1 k*0[vc2c7q] -> price=25MGC cheap_key
-#1 k*0[tvfkyq] -> 
-#1 k*1[xwz7ja] -> price=25MGC cheap_key
-#1 k*0[uphlaw] -> 
-#1 k*1[sa23uw] -> 
-#1 k**[72umy0] rarity=2:3 -> price=100MGC
-#1 k*0[cmppiq] -> 
-#1 k*1[i874y3] -> 
-#1 k**[eoq6de] rarity=2:3 -> price=200MGC
-#1 k*1[9p65cu] -> 
-#1 k*0[6hh8xw] -> 
-#1 k*1[pmvr1q] -> 
-#1 k**[fr8ibu] rarity=2:3 -> price=1QGC barter
-#1 k*1[ellux0] -> 
-#1 k**[xfnkqe] -> price=1QGC barter
-#1 k**[y111qa] -> price=1QGC barter
+#2 k*0[vc2c7q] -> price=25MGC cheap_key
+#2 k*0[tvfkyq] -> 
+#2 k*1[xwz7ja] -> price=25MGC cheap_key
+#2 k*0[uphlaw] -> 
+#2 k*1[sa23uw] -> 
+#2 k**[72umy0] rarity=2:3 -> price=100MGC
+#2 k*0[cmppiq] -> 
+#2 k*1[i874y3] -> 
+#2 k**[eoq6de] rarity=2:3 -> price=200MGC
+#2 k*1[9p65cu] -> 
+#2 k*0[6hh8xw] -> 
+#2 k*1[pmvr1q] -> 
+#2 k**[fr8ibu] rarity=2:3 -> price=1QGC barter
+#2 k*1[ellux0] -> 
+#2 k**[xfnkqe] -> price=1QGC barter
+#2 k**[y111qa] -> price=1QGC barter
 
-#1 k*0[hc3b69] -> price=25MGC cheap_key
-#1 k*0[5c7e1r] ->
-#1 k*1[4jitu5] -> price=25MGC cheap_key
-#1 k*1[lq09tg] ->
-#1 k*1[vthf6e] ->
-#1 k*0[nfijix] ->
-#1 k**[nyi5u2] rarity=2:3 -> price=300MGC
-#1 k**[voon2h] rarity=2:3 -> price=1QGC barter
-#1 k**[j1aa4n] rarity=2:3 -> price=1QGC barter
-#1 k**[d9j270] rarity=2:3 -> price=1QGC barter
-#1 k**[vzdt6m] rarity=2:3 -> price=1QGC barter
-#1 k**[cy70mo] rarity=2:3 -> price=1QGC barter
-#1 k**[8izsag] -> price=1QGC barter
-#1 k**[hzqgw6] -> price=1QGC barter
-#1 k**[qvgtnt] -> price=1QGC barter
-#1 k**[ooilt2] -> price=1QGC barter
+#2 k*0[hc3b69] -> price=25MGC cheap_key
+#2 k*0[5c7e1r] ->
+#2 k*1[4jitu5] -> price=25MGC cheap_key
+#2 k*1[lq09tg] ->
+#2 k*1[vthf6e] ->
+#2 k*0[nfijix] ->
+#2 k**[nyi5u2] rarity=2:3 -> price=300MGC
+#2 k**[voon2h] rarity=2:3 -> price=1QGC barter
+#2 k**[j1aa4n] rarity=2:3 -> price=1QGC barter
+#2 k**[d9j270] rarity=2:3 -> price=1QGC barter
+#2 k**[vzdt6m] rarity=2:3 -> price=1QGC barter
+#2 k**[cy70mo] rarity=2:3 -> price=1QGC barter
+#2 k**[8izsag] -> price=1QGC barter
+#2 k**[hzqgw6] -> price=1QGC barter
+#2 k**[qvgtnt] -> price=1QGC barter
+#2 k**[ooilt2] -> price=1QGC barter
 
-#1 k**[afgny5] -> price=25BGC cheap_key
-#1 k**[54r1cg] -> 
-#1 k**[dwwf3w] -> 
-#1 k**[7oxb1b] -> 
-
-
-#1 k10 !cheap_key -> alch price=1QGC
-#1 k11 !cheap_key -> alch price=1QGC
-#1 k20 !cheap_key -> alch price=1QGC
-#1 k21 !cheap_key -> alch price=1QGC
-#1 k30 !cheap_key -> alch price=1QGC
-#1 k31 !cheap_key -> alch price=1QGC
-
-#1 k price=undefined -> price=1QGC barter
+#2 k**[afgny5] -> price=25BGC cheap_key
+#2 k**[54r1cg] -> 
+#2 k**[dwwf3w] -> 
+#2 k**[7oxb1b] -> 
 
 
+#2 k10 !cheap_key -> alch price=1QGC
+#2 k11 !cheap_key -> alch price=1QGC
+#2 k20 !cheap_key -> alch price=1QGC
+#2 k21 !cheap_key -> alch price=1QGC
+#2 k30 !cheap_key -> alch price=1QGC
+#2 k31 !cheap_key -> alch price=1QGC
+
+#2 k price=undefined -> price=1QGC barter
 
 
 
 
 
 
-#1 * barter -> sell=undefined
 
-#1 * keep !the_best -> sell keep=undefined
 
-#1 * !keep !sell !cull -> anomaly
-#1 * sell price=undefined -> price="NO PRICE!!!!!!"
+#99 * barter -> sell=undefined
 
-#1 * -> display
+#99 * keep !the_best -> sell keep=undefined
+
+#99 * !keep !sell !cull -> anomaly
+#99 * sell price=undefined -> price="NO PRICE!!!!!!"
+
+#99 * -> display

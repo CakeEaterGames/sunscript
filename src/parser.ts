@@ -258,9 +258,7 @@ function parseAlias(): response<Alias> {
   t = consume(";");
   if (t.type == "error") return t;
 
-  //Yes, it is now the other way around to make multiple upgrades match the same alias
-  return resp({ v: k, k: v });
-  // return resp({ k, v });
+  return resp({ k, v });
 }
 
 function parseFilters(): response<Array<SUNFilter | LUNFilter>> {
