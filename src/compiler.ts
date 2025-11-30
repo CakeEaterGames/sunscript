@@ -2,7 +2,7 @@ import { parse } from "./parser"
 import { Rule } from "./types"
 
 export type program = {
-  stages: Array<Rule[]>
+  stages: Rule[][]
 }
 
 /**
@@ -19,11 +19,21 @@ export function compile(input: string): program {
 
   let ast = parse(input)
   if (ast.errors.length > 0) throw ast.errors
-  let p = ast.parsed.filter(a => !a.pp)
-  let pp = ast.parsed.filter(a => a.pp)
+
+  let stageNums: number[] = []
+  for (const Rule of ast.parsed) {
+    if (!stageNums.includes(Rule._stage)) {
+      stageNums.push(Rule._stage)
+    }
+  }
+  stageNums.sort((a, b) => a - b)
+
+  let res:Rule[][] = []
+  for (const s of stageNums) {
+    res.push(ast.parsed.filter(a => a._stage == s))
+  }
+ 
   return {
-    stages: [
-      p, pp,
-    ]
+    stages: res
   }
 }

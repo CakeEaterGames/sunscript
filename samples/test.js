@@ -37,8 +37,8 @@ function(context, args) {
 	c[1460:*] -> sell price=1BGC;>     // Sell all char_counts with 1000+ chars
 	c         -> cull;>                // Destroy all other char_counts
 
-	pp c keep _best=3 -> the_best     
-	pp c keep !the_best -> sell keep=undefined    // Only keep the best 3
+	#1 c keep _best=3 -> the_best     
+	#1 c keep !the_best -> sell keep=undefined    // Only keep the best 3
 `)
     let upgrades = getUps();
     const filtered = SUN.filter(upgrades, CharCountFilter)

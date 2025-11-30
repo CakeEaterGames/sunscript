@@ -23,9 +23,9 @@ const CharCountFilter = SUN.compile(`
 	c[1460:*] -> sell price=1BGC;>     // Sell all char_counts with 1000+ chars
 	c         -> cull;>                // Destroy all other char_counts
 
-	pp c keep _best=3 -> the_best     
-	pp c keep !the_best -> sell keep=undefined    // Only keep the best 3
-	pp _filtered -> display            // Display all upgrades touched by the filter 
+	#1 c keep _best=3 -> the_best     
+	#1 c keep !the_best -> sell keep=undefined    // Only keep the best 3
+	#1 c -> display            // Display all char_counts 
 `)
 const filtered = SUN.filter(upgrades, CharCountFilter)
 // "filtered" will contain all items of array "upgrades" that triggered at least one rule in the list.
@@ -210,18 +210,38 @@ c -> cull=true
 S[4] -> keep=true;> //keep public_scripts with 4 slots
 ```
 
-#### Postprocessing
+#### Stages
 
-Keyword 'pp' stands for postprocessing. You can prefix your Rules with 'pp' to say that the rule should be executed after all the non pp rules got executed. If the script finished or '>' keyword got triggered, the pp rules will start executing in the order they are written. You can place pp rules between non pp rules.
+You can define at what stage a rule should be triggered by prefixing it with a "#" followed by a number. If you don't define the stage, it is set to 0 by default. If the script finished or '>' keyword got triggered, the new stage will start. You can ignore this functionality and simply compile multiple sunscripts and execute them one after the other, but it makes a lot of sense to place rules out of their execution order for better readability.
+
+These 2 sunscripts are equivalent to each other. The compiler reorders the rules before execution.
+```
+c -> a=1
+#1 c -> a=3
+#2 c -> a=5
+
+#0 c -> a=2
+#1 c -> a=4
+#2 c -> a=6
+```
+
+```
+c -> a=1
+c -> a=2
+c -> a=3
+c -> a=4
+c -> a=5
+c -> a=6
+```
+
+Which is also equivalent to executing 3 separate sunscripts.
+
+
 
 Example from the top of the page:
 ```
-c[1400:*] -> keep=true price=1BGC;>    
-c[1000:*] -> sell=true price=100MGC;>  
-c        -> cull=true;>              
 
-// Mark all upgrades as anomalies that didn't match any filter
-pp * !keep !sell !cull -> anomaly=true
+
 ```
 
 ## Tables of reference

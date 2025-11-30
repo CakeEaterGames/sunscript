@@ -75,13 +75,13 @@ c[1500:*] -> keep price=10BGC;>
 c[1460:*] -> sell price=1BGC;>  
 c         -> cull;>              
 
-pp c keep _best=3 -> the_best
-pp c keep !the_best -> sell keep=undefined
+#1 c keep _best=3 -> the_best
+#1 c keep !the_best -> sell keep=undefined
 
-pp _filtered -> display
+#1 c -> display
 
 //Uncomment this display ALL upgrades in this dataset
-//pp * -> display
+//#1 * -> display
     </textarea>
 
     <div id="table-container"></div>
@@ -118,7 +118,7 @@ pp _filtered -> display
             displayed = displayed.filter((a) => a.display)
             lib.sortUpgrades(displayed)
 
-            createTable(displayed, 'table-container', ["i", "the_best", "name", "special", "snack", "keep", "sell", "cull", "price", "original", "material", "extra", "anomaly"])
+            createTable(displayed, 'table-container', ["i", "the_best", "name", "special", "snack","cull", "keep", "sell", "barter", "price", "original", "material", "extra", "anomaly"])
 
         }
 

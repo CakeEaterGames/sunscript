@@ -60,7 +60,11 @@ export function filter(upgrades: Array<Upgrade>, compiled: program) {
   }
   let triggered = false
   for (const stage of compiled.stages) {
+    //When new stage begins we reset the context by clearing the _filtered marker
     dataset = [...upgrades]
+    for (const u of dataset) {
+      delete u._filtered;
+    }
     for (const rule of stage) {
       // console.log(rule);
 
@@ -225,7 +229,7 @@ function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
     }
 
     for (const k in f) {
-      if (["_best", "_worst", "alias", "ready", "value", "pp", "type"].includes(k)) continue;
+      if (["_best", "_worst", "alias", "ready", "value", "_stage", "type"].includes(k)) continue;
       const v = f[k];
       if (v != undefined && ((!inRangeOrValue(u[k], v)) !== negative)) return false;
     }

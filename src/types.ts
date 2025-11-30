@@ -4,7 +4,7 @@ export type Rule = {
     filters?: Array<Filter>;
     actions?: Array<Action>;
     alias?: Alias;
-    pp?: boolean;
+    _stage: number;
     return?: boolean;
 }
 export type SUNFilter = {

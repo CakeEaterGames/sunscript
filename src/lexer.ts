@@ -5,7 +5,7 @@ export function lex(input: string) {
   let lines = input.split('\n')
   for (let l of lines) {
     let raw = l;
-    let comment = "/" + "/" //yes like that! Do not modify!
+    let comment = "//" //yes like that! Do not modify!
     if (l.includes(comment)) {
       l = l.substring(0, l.indexOf(comment))
     }
@@ -21,7 +21,7 @@ export function lex(input: string) {
 }
 
 function lexLine(input: string) {
-  const reserved_chars = "=!:;+-^~>[]*"
+  const reserved_chars = "=!:;+-^~>[]*#"
   const reserved = [
     "->", ...reserved_chars,
   ]
@@ -60,6 +60,7 @@ function lexLine(input: string) {
       res.push(str)
       continue
     }
+
 
     let str = c
     i++;

@@ -21,7 +21,7 @@ function(context,args){ //
 `);
     for (let l of lines) {
       let raw = l;
-      let comment = "/" + "/";
+      let comment = "\/\/";
       if (l.includes(comment)) {
         l = l.substring(0, l.indexOf(comment));
       }
@@ -37,7 +37,7 @@ function(context,args){ //
     return res;
   }
   function lexLine(input) {
-    const reserved_chars = "=!:;+-^~>[]*";
+    const reserved_chars = "=!:;+-^~>[]*#";
     const reserved = [
       "->",
       ...reserved_chars
@@ -180,7 +180,7 @@ function(context,args){ //
   function parseRule() {
     stackLog("parseRule");
     skipSpaces();
-    let res = {};
+    let res = { _stage: 0 };
     if (cur == ">") {
       res.return = true;
       advance();
@@ -190,12 +190,14 @@ function(context,args){ //
         return t;
       return resp(res);
     }
-    if (cur == "pp") {
+    if (cur == "#") {
       advance();
-      res.pp = true;
-      let s = consume(" ");
-      if (s.type == "error")
-        return s;
+      let t = parseValue();
+      if (t.type == "error")
+        return t;
+      if (typeof t.value != "number")
+        return expectedError(["number"], JSON.stringify(t.value), "Stage error. ");
+      res._stage = t.value;
       skipSpaces();
     }
     if (cur == "alias") {
@@ -538,13 +540,19 @@ function(context,args){ //
     let ast = parse(input);
     if (ast.errors.length > 0)
       throw ast.errors;
-    let p = ast.parsed.filter((a) => !a.pp);
-    let pp = ast.parsed.filter((a) => a.pp);
+    let stageNums = [];
+    for (const Rule of ast.parsed) {
+      if (!stageNums.includes(Rule._stage)) {
+        stageNums.push(Rule._stage);
+      }
+    }
+    stageNums.sort((a, b) => a - b);
+    let res = [];
+    for (const s of stageNums) {
+      res.push(ast.parsed.filter((a) => a._stage == s));
+    }
     return {
-      stages: [
-        p,
-        pp
-      ]
+      stages: res
     };
   }
 
@@ -596,6 +604,9 @@ function(context,args){ //
     let triggered = false;
     for (const stage of compiled.stages) {
       dataset = [...upgrades];
+      for (const u of dataset) {
+        delete u._filtered;
+      }
       for (const rule of stage) {
         if (rule.return) {
           dataset = dataset.filter((a) => !a._filtered);
@@ -759,7 +770,7 @@ function(context,args){ //
           return false;
       }
       for (const k in f) {
-        if (["_best", "_worst", "alias", "ready", "value", "pp", "type"].includes(k))
+        if (["_best", "_worst", "alias", "ready", "value", "_stage", "type"].includes(k))
           continue;
         const v = f[k];
         if (v != null && !inRangeOrValue(u[k], v) !== negative)

@@ -122,7 +122,7 @@ function parseRule(): response<Rule> {
   stackLog("parseRule")
 
   skipSpaces();
-  let res = {} as Rule
+  let res = { _stage: 0 } as Rule
 
   if (cur == ">") {
     res.return = true;
@@ -132,11 +132,14 @@ function parseRule(): response<Rule> {
     if (t.type == "error") return t as response<Rule>;
     return resp(res)
   }
-  if (cur == "pp") {
-    advance();
-    res.pp = true
-    let s = consume(" ");
-    if (s.type == "error") return s;
+
+  if (cur == "#") {
+    advance()
+    let t = parseValue()
+    if (t.type == "error") return t;
+    if (typeof t.value != "number")
+      return expectedError(["number"], JSON.stringify(t.value), "Stage error. ") as response<Rule>
+    res._stage = t.value;
     skipSpaces();
   }
 
