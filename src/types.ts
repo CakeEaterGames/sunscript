@@ -1,11 +1,21 @@
 export type commonTypes = string | boolean | undefined | number;
 
+export type Program = {
+    stages:Stage[]
+}
+
+export type Stage = CMD[]
+
+export type CMD =
+    | { type: "rule", data: Rule }
+    | { type: "stage", data: undefined }
+    | { type: "alias", data: Alias }
+    | { type: "return", data: undefined }
+
+
 export type Rule = {
     filters?: Array<Filter>;
     actions?: Array<Action>;
-    alias?: Alias;
-    _stage: number;
-    return?: boolean;
 }
 export type SUNFilter = {
     type: "sun"

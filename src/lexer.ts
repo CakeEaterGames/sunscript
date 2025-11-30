@@ -21,9 +21,9 @@ export function lex(input: string) {
 }
 
 function lexLine(input: string) {
-  const reserved_chars = "=!:;+-^~>[]*#"
+  const reserved_chars = "=!:;+-^~>[]*"
   const reserved = [
-    "->", ...reserved_chars,
+    "->","---", ...reserved_chars,
   ]
   function compareFromI(a: string, b: string, i: number) {
     return a.substring(i, i + b.length) == b

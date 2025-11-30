@@ -11,3 +11,8 @@ export function isAlphaNum(str:string) {
   }
   return true
 }
+
+
+export function isNum(str:string) {
+  return isNaN(Number(str))
+}

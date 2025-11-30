@@ -1,43 +1,42 @@
-import { program } from "./compiler";
-import { Action, commonTypes, Filter, range, Rule } from "./types";
+import { Action, commonTypes, Filter, Program, range, Rule } from "./types";
 
 
 export const Aliases: Record<string, string> = {
-  "x":"l0ckbox",
-  "j":"l0ckjaw",
-  "q":"l0cket",
-  "a":"acct_nt",
-  "m":"magnara",
-  "W":"l0g_wr1t3r",
-  "o":"sn_w_usac",
-  "f":"shfflr",
-  "N":"CON_TELL",
-  "n":"CON_SPEC",
-  "D":"DATA_CHECK",
-  "g":"sn_w_glock",
-  "2":"ez_21",
-  "3":"ez_35",
-  "4":"ez_40",
-  "X":"c001",
-  "y":"c002",
-  "Y":"c003",
-  "C":"cron_bot",
-  "c":"char_count",
-  "s":"script_slot",
-  "S":"public_script",
-  "0":"channel_count",
-  "k":"k3y",
-  "b":"balance",
-  "w":"log_writer",
-  "t":"transactions",
-  "T":"transfer",
-  "u":"expose_upgrades",
-  "U":"transfer_upgrade",
-  "l":"expose_access_log",
-  "L":"expose_upgrade_log",
-  "z":"w4rn",
-  "Z":"w4rn_message",
-  "r":"w4rn_er",
+  "x": "l0ckbox",
+  "j": "l0ckjaw",
+  "q": "l0cket",
+  "a": "acct_nt",
+  "m": "magnara",
+  "W": "l0g_wr1t3r",
+  "o": "sn_w_usac",
+  "f": "shfflr",
+  "N": "CON_TELL",
+  "n": "CON_SPEC",
+  "D": "DATA_CHECK",
+  "g": "sn_w_glock",
+  "2": "ez_21",
+  "3": "ez_35",
+  "4": "ez_40",
+  "X": "c001",
+  "y": "c002",
+  "Y": "c003",
+  "C": "cron_bot",
+  "c": "char_count",
+  "s": "script_slot",
+  "S": "public_script",
+  "0": "channel_count",
+  "k": "k3y",
+  "b": "balance",
+  "w": "log_writer",
+  "t": "transactions",
+  "T": "transfer",
+  "u": "expose_upgrades",
+  "U": "transfer_upgrade",
+  "l": "expose_access_log",
+  "L": "expose_upgrade_log",
+  "z": "w4rn",
+  "Z": "w4rn_message",
+  "r": "w4rn_er",
 };
 
 type Upgrade = {
@@ -53,12 +52,12 @@ let aliases: typeof Aliases
 
 let dataset: Upgrade[];
 
-export function filter(upgrades: Array<Upgrade>, compiled: program) {
+export function filter(upgrades: Array<Upgrade>, compiled: Program) {
   aliases = {}
   for (const k in Aliases) {
     aliases[k] = Aliases[k]
   }
-  let triggered = false
+
   for (const stage of compiled.stages) {
     //When new stage begins we reset the context by clearing the _filtered marker
     dataset = [...upgrades]
@@ -66,39 +65,44 @@ export function filter(upgrades: Array<Upgrade>, compiled: program) {
       delete u._filtered;
     }
     for (const rule of stage) {
-      // console.log(rule);
-
-      if (rule.return) {
+      if (rule.type == "return") {
         dataset = dataset.filter(a => !a._filtered)
         if (dataset.length == 0) break;
         continue;
       }
-      if (rule.alias) {
-        aliases[rule.alias.k] = rule.alias.v
+      if (rule.type == "alias") {
+        aliases[rule.data.k] = rule.data.v
         continue
       }
-      let ups: Upgrade[] = []
-      for (const u of dataset) {
-        if (rule.filters && filterOneUpgrade(u, rule.filters)) {
-          ups.push(u)
-          triggered = true;
+      if (rule.type = "rule") {
+        if (!rule.data) throw Error("Wtf?")
+        let ups: Upgrade[] = []
+        for (const u of dataset) {
+          if (!rule.data.filters) {
+            ups.push(u)
+            continue;
+          }
+          if (filterOneUpgrade(u, rule.data!.filters)) {
+            ups.push(u)
+          }
+        }
+
+        let b = (rule.data.filters || []).find(a => a._best !== undefined) //because ?. is broken
+        let w = (rule.data.filters || []).find(a => a._worst !== undefined)
+
+        if (b && typeof b._best == "number") {
+          ups = filterBest(ups, b._best, false, b.negative === true)
+        } else if (w && typeof w._worst == "number") {
+          ups = filterBest(ups, w._worst, true, w.negative === true)
+        }
+        for (const u of ups) {
+          u._filtered = true;
+          if (rule.data.actions) {
+            performActions(u, rule.data.actions)
+          }
         }
       }
 
-      let b = (rule.filters || []).find(a => a._best!==undefined) //because ?. is broken
-      let w = (rule.filters || []).find(a => a._worst!==undefined)
-
-      if (b && typeof b._best == "number") {
-        ups = filterBest(ups, b._best, false, b.negative === true)
-      } else if (w && typeof w._worst == "number") {
-        ups = filterBest(ups, w._worst, true, w.negative === true)
-      }
-      for (const u of ups) {
-        u._filtered = true;
-        if (rule.actions) {
-          performActions(u, rule.actions)
-        }
-      }
 
     }
   }
@@ -229,7 +233,7 @@ function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
     }
 
     for (const k in f) {
-      if (["_best", "_worst", "alias", "ready", "value", "_stage", "type"].includes(k)) continue;
+      if (["_best", "_worst", "alias", "ready", "value", "next_stage", "type"].includes(k)) continue;
       const v = f[k];
       if (v != undefined && ((!inRangeOrValue(u[k], v)) !== negative)) return false;
     }

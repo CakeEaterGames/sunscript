@@ -16,18 +16,21 @@ Try the [live demo](https://cakeeatergames.github.io/sunscript/)
 ## Usage
 
 ```js
-const SUN = #fs.cake.sun_v0({import:true})
-const CharCountFilter = SUN.compile(`
+let SUN = #fs.cake.sun_v0({import:true})
+let CharCountFilter = SUN.compile(`
 	alias c = char_count
-	c[1500:*] -> keep price=10BGC;>    // Keep all char_counts with 1400+ chars 
-	c[1460:*] -> sell price=1BGC;>     // Sell all char_counts with 1000+ chars
+	c[1500:*] -> keep price=10BGC;>    // Keep all char_counts with 1500+ chars 
+	c[1460:*] -> sell price=1BGC;>     // Sell all char_counts with 1460+ chars
 	c         -> cull;>                // Destroy all other char_counts
 
-	#1 c keep _best=3 -> the_best     
-	#1 c keep !the_best -> sell keep=undefined    // Only keep the best 3
-	#1 c -> display            // Display all char_counts 
+	--- // Next stage 
+
+	c keep _best=3 -> the_best     
+	c keep !the_best -> sell keep=undefined    // Only keep the best 3
+	c -> display            // Display all char_counts 
 `)
-const filtered = SUN.filter(upgrades, CharCountFilter)
+let upgrades = #hs.sys.upgrades({full:true})
+let filtered = SUN.filter(upgrades, CharCountFilter)
 // "filtered" will contain all items of array "upgrades" that triggered at least one rule in the list.
 // Array items now have additional properties: keep, sell, cull, price, the_best, _filtered, display
 let keep = upgrades.filter(a=>a.keep)
@@ -195,7 +198,7 @@ c[1000:*] good=true // A combination of previous filter with a LUN filter
 
 #### Return statement
 
-'>' is a special command that means "stop filtering if any of the previous filters got triggered"
+'>' is a special command that means "stop filtering if upgrade matched a filter". After a triggered return statement the script goes to the next stage
 ```
 c[1400:*] -> keep=true price=1BGC
 > //return if item is meant to be kept
@@ -212,36 +215,18 @@ S[4] -> keep=true;> //keep public_scripts with 4 slots
 
 #### Stages
 
-You can define at what stage a rule should be triggered by prefixing it with a "#" followed by a number. If you don't define the stage, it is set to 0 by default. If the script finished or '>' keyword got triggered, the new stage will start. You can ignore this functionality and simply compile multiple sunscripts and execute them one after the other, but it makes a lot of sense to place rules out of their execution order for better readability.
-
-These 2 sunscripts are equivalent to each other. The compiler reorders the rules before execution.
+You can essentially compile multiple sunscripts in one file by separating them with "---". This sample is equivalent to compiling 2 sunscripts and executing them one after another.
 ```
-c -> a=1
-#1 c -> a=3
-#2 c -> a=5
+	alias c = char_count
+	c[1500:*] -> keep price=10BGC;>    // Keep all char_counts with 1400+ chars 
+	c[1460:*] -> sell price=1BGC;>     // Sell all char_counts with 1000+ chars
+	c         -> cull;>                // Destroy all other char_counts
 
-#0 c -> a=2
-#1 c -> a=4
-#2 c -> a=6
-```
+	--- // Next stage 
 
-```
-c -> a=1
-c -> a=2
-c -> a=3
-c -> a=4
-c -> a=5
-c -> a=6
-```
-
-Which is also equivalent to executing 3 separate sunscripts.
-
-
-
-Example from the top of the page:
-```
-
-
+	c keep _best=3 -> the_best     
+	c keep !the_best -> sell keep=undefined    // Only keep the best 3
+	c -> display            // Display all char_counts 
 ```
 
 ## Tables of reference

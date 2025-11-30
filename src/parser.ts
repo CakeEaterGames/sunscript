@@ -1,6 +1,6 @@
 import { lex } from "./lexer"
-import { Action, Alias, commonTypes, LUNFilter, range, Rule, SUNFilter } from "./types";
-import { isAlphaNum } from "./utils"
+import { Action, Alias, CMD, commonTypes, LUNFilter, Program, range, Rule, Stage, SUNFilter } from "./types";
+import { isAlphaNum, isNum } from "./utils"
 
 function expectedError(expected: string[], got: string, prefix = "", postfix = "") {
 
@@ -25,7 +25,7 @@ let curI = 0
 export function parse(input: string) {
   let lines = lex(input)
   // log(tokens)
-  let parsed = []
+  let parsed: CMD[] = []
   let errors = []
 
   for (const l of lines) {
@@ -98,7 +98,7 @@ function error<T>(e: any): response<T> {
   return { type: "error", error: e }
 }
 
-function parseScriptLine(): response<Array<Rule>> {
+function parseScriptLine(): response<CMD[]> {
   stackLog("parseScriptLine")
 
   skipSpaces();
@@ -108,7 +108,7 @@ function parseScriptLine(): response<Array<Rule>> {
     while (cur == ";") advance();
     if (eof()) return resp(rules);
 
-    let r = parseRule()
+    let r = parseCMD()
 
     if (r.type == "error") return r;
     if (r.value) rules.push(r.value)
@@ -118,41 +118,45 @@ function parseScriptLine(): response<Array<Rule>> {
   return resp(rules)
 }
 
-function parseRule(): response<Rule> {
-  stackLog("parseRule")
+function parseCMD(): response<CMD> {
+  stackLog("parseCMD")
 
   skipSpaces();
-  let res = { _stage: 0 } as Rule
+  let res = {} as CMD
 
   if (cur == ">") {
-    res.return = true;
+    res.type = "return"
     advance()
     skipSpaces();
     let t = consume(";")
-    if (t.type == "error") return t as response<Rule>;
+    if (t.type == "error") return t as response<CMD>;
     return resp(res)
   }
 
-  if (cur == "#") {
+  if (cur == "---") {
+    res.type = "stage"
     advance()
-    let t = parseValue()
-    if (t.type == "error") return t;
-    if (typeof t.value != "number")
-      return expectedError(["number"], JSON.stringify(t.value), "Stage error. ") as response<Rule>
-    res._stage = t.value;
     skipSpaces();
+    let t = consume(';')
+    if (t.type == "error") return t
+    return resp(res)
   }
 
   if (cur == "alias") {
+    res.type = "alias"
     let alias = parseAlias()
     if (alias.type == "error") return alias;
-    res.alias = alias.value
+    res.data = alias.value
     return resp(res)
   }
 
+  let rule: Rule = {}
+  res.type = "rule"
+  res.data = rule
+
   let filters = parseFilters()
   if (filters.type == "error") return filters;
-  res.filters = filters.value
+  rule.filters = filters.value
   skipSpaces();
 
   if (cur == ";") {
@@ -168,14 +172,15 @@ function parseRule(): response<Rule> {
 
     let actions = parseActions()
     if (actions.type == "error") return actions;
-    res.actions = actions.value;
+    rule.actions = actions.value;
     skipSpaces();
 
     let t = consume(";");
     if (t.type == "error") return t;
   }
 
-  // if (res.actions.length == 0) delete res.actions
+  if (rule.actions && rule.actions.length == 0) delete rule.actions
+  if (rule.filters && rule.filters.length == 0) delete rule.filters
 
   return resp(res)
 }
@@ -474,6 +479,14 @@ function parseValue(): response<range | commonTypes> {
     if (v.value == undefined) return resp(undefined)
     return resp(v.value)
   }
+}
+
+function parseInt(): response<number> {
+  if (typeof cur != "number") {
+    return expectedError(["number"], cur) as response<number>
+  }
+  return resp(Number(cur))
+
 }
 
 function parseValueType(): response<commonTypes> {

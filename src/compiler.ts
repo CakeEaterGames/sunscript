@@ -1,16 +1,13 @@
 import { parse } from "./parser"
-import { Rule } from "./types"
+import { CMD, Program, Rule } from "./types"
 
-export type program = {
-  stages: Rule[][]
-}
 
 /**
  * Compiles a plaintext SUNSCRIPT into a JSON object that can be used multiple times
  * @param input SUNSCRIPT code
  * @throws Array of Strings if the program didn't parse properly
  */
-export function compile(input: string): program {
+export function compile(input: string): Program {
 
   //Not much to compile tbh
   //There might be more stuff here in the future but for now, 
@@ -20,20 +17,22 @@ export function compile(input: string): program {
   let ast = parse(input)
   if (ast.errors.length > 0) throw ast.errors
 
-  let stageNums: number[] = []
-  for (const Rule of ast.parsed) {
-    if (!stageNums.includes(Rule._stage)) {
-      stageNums.push(Rule._stage)
+  let res: Program = { stages: [] }
+  let stage: CMD[] = []
+  for (let i = 0; i < ast.parsed.length; i++) {
+    const cmd = ast.parsed[i];
+
+    if (cmd.type == "stage") {
+      res.stages.push(stage)
+      stage = []
+    } else {
+      stage.push(cmd)
+    }
+
+    if (i == ast.parsed.length - 1) {
+      res.stages.push(stage)
     }
   }
-  stageNums.sort((a, b) => a - b)
 
-  let res:Rule[][] = []
-  for (const s of stageNums) {
-    res.push(ast.parsed.filter(a => a._stage == s))
-  }
- 
-  return {
-    stages: res
-  }
+  return res
 }

@@ -37,9 +37,10 @@ function(context,args){ //
     return res;
   }
   function lexLine(input) {
-    const reserved_chars = "=!:;+-^~>[]*#";
+    const reserved_chars = "=!:;+-^~>[]*";
     const reserved = [
       "->",
+      "---",
       ...reserved_chars
     ];
     function compareFromI(a, b, i) {
@@ -169,7 +170,7 @@ function(context,args){ //
         advance();
       if (eof())
         return resp(rules);
-      let r = parseRule();
+      let r = parseCMD();
       if (r.type == "error")
         return r;
       if (r.value)
@@ -177,12 +178,12 @@ function(context,args){ //
     }
     return resp(rules);
   }
-  function parseRule() {
-    stackLog("parseRule");
+  function parseCMD() {
+    stackLog("parseCMD");
     skipSpaces();
-    let res = { _stage: 0 };
+    let res = {};
     if (cur == ">") {
-      res.return = true;
+      res.type = "return";
       advance();
       skipSpaces();
       let t = consume(";");
@@ -190,27 +191,30 @@ function(context,args){ //
         return t;
       return resp(res);
     }
-    if (cur == "#") {
+    if (cur == "---") {
+      res.type = "stage";
       advance();
-      let t = parseValue();
+      skipSpaces();
+      let t = consume(";");
       if (t.type == "error")
         return t;
-      if (typeof t.value != "number")
-        return expectedError(["number"], JSON.stringify(t.value), "Stage error. ");
-      res._stage = t.value;
-      skipSpaces();
+      return resp(res);
     }
     if (cur == "alias") {
+      res.type = "alias";
       let alias = parseAlias();
       if (alias.type == "error")
         return alias;
-      res.alias = alias.value;
+      res.data = alias.value;
       return resp(res);
     }
+    let rule = {};
+    res.type = "rule";
+    res.data = rule;
     let filters = parseFilters();
     if (filters.type == "error")
       return filters;
-    res.filters = filters.value;
+    rule.filters = filters.value;
     skipSpaces();
     if (cur == ";") {
       advance();
@@ -222,12 +226,16 @@ function(context,args){ //
       let actions = parseActions();
       if (actions.type == "error")
         return actions;
-      res.actions = actions.value;
+      rule.actions = actions.value;
       skipSpaces();
       let t = consume(";");
       if (t.type == "error")
         return t;
     }
+    if (rule.actions && rule.actions.length == 0)
+      delete rule.actions;
+    if (rule.filters && rule.filters.length == 0)
+      delete rule.filters;
     return resp(res);
   }
   function parseActions() {
@@ -540,20 +548,22 @@ function(context,args){ //
     let ast = parse(input);
     if (ast.errors.length > 0)
       throw ast.errors;
-    let stageNums = [];
-    for (const Rule of ast.parsed) {
-      if (!stageNums.includes(Rule._stage)) {
-        stageNums.push(Rule._stage);
+    let res = { stages: [] };
+    let stage = [];
+    for (let i = 0;i < ast.parsed.length; i++) {
+      const cmd = ast.parsed[i];
+      if (cmd.type == "stage") {
+        res.stages.push(stage);
+        stage = [];
+      } else {
+        stage.push(cmd);
+      }
+      if (i == ast.parsed.length - 1) {
+        res.stages.push(stage);
       }
     }
-    stageNums.sort((a, b) => a - b);
-    let res = [];
-    for (const s of stageNums) {
-      res.push(ast.parsed.filter((a) => a._stage == s));
-    }
-    return {
-      stages: res
-    };
+    console.log(res);
+    return res;
   }
 
   // src/filter.ts
@@ -601,41 +611,47 @@ function(context,args){ //
     for (const k in Aliases) {
       aliases[k] = Aliases[k];
     }
-    let triggered = false;
     for (const stage of compiled.stages) {
       dataset = [...upgrades];
       for (const u of dataset) {
         delete u._filtered;
       }
       for (const rule of stage) {
-        if (rule.return) {
+        if (rule.type == "return") {
           dataset = dataset.filter((a) => !a._filtered);
           if (dataset.length == 0)
             break;
           continue;
         }
-        if (rule.alias) {
-          aliases[rule.alias.k] = rule.alias.v;
+        if (rule.type == "alias") {
+          aliases[rule.data.k] = rule.data.v;
           continue;
         }
-        let ups = [];
-        for (const u of dataset) {
-          if (rule.filters && filterOneUpgrade(u, rule.filters)) {
-            ups.push(u);
-            triggered = true;
+        if (rule.type = "rule") {
+          if (!rule.data)
+            throw Error("Wtf?");
+          let ups = [];
+          for (const u of dataset) {
+            if (!rule.data.filters) {
+              ups.push(u);
+              continue;
+            }
+            if (filterOneUpgrade(u, rule.data.filters)) {
+              ups.push(u);
+            }
           }
-        }
-        let b = (rule.filters || []).find((a) => a._best !== undefined);
-        let w = (rule.filters || []).find((a) => a._worst !== undefined);
-        if (b && typeof b._best == "number") {
-          ups = filterBest(ups, b._best, false, b.negative === true);
-        } else if (w && typeof w._worst == "number") {
-          ups = filterBest(ups, w._worst, true, w.negative === true);
-        }
-        for (const u of ups) {
-          u._filtered = true;
-          if (rule.actions) {
-            performActions(u, rule.actions);
+          let b = (rule.data.filters || []).find((a) => a._best !== undefined);
+          let w = (rule.data.filters || []).find((a) => a._worst !== undefined);
+          if (b && typeof b._best == "number") {
+            ups = filterBest(ups, b._best, false, b.negative === true);
+          } else if (w && typeof w._worst == "number") {
+            ups = filterBest(ups, w._worst, true, w.negative === true);
+          }
+          for (const u of ups) {
+            u._filtered = true;
+            if (rule.data.actions) {
+              performActions(u, rule.data.actions);
+            }
           }
         }
       }
@@ -770,7 +786,7 @@ function(context,args){ //
           return false;
       }
       for (const k in f) {
-        if (["_best", "_worst", "alias", "ready", "value", "_stage", "type"].includes(k))
+        if (["_best", "_worst", "alias", "ready", "value", "next_stage", "type"].includes(k))
           continue;
         const v = f[k];
         if (v != null && !inRangeOrValue(u[k], v) !== negative)
