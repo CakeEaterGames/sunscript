@@ -423,7 +423,7 @@
     if (cur != " " && cur != ";" && cur != "->") {
       return expectedError(["->", ";", " "], cur, "SUN Rule error. ");
     }
-    advance();
+    skipSpaces();
     if (r.loaded === undefined)
       delete r.loaded;
     if (r.negative === undefined)

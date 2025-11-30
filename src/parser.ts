@@ -406,7 +406,7 @@ function parseSUN(): response<SUNFilter> {
   if (cur != ' ' && cur != ';' && cur != '->') {
     return expectedError(["->", ";", " "], cur, "SUN Rule error. ") as response<SUNFilter>
   }
-  advance()
+  skipSpaces();
 
   // DAMN YOU TYPESCRIPT
   // for (const k in r) {
