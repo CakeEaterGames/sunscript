@@ -58,6 +58,8 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
     aliases[k] = Aliases[k]
   }
 
+  let filtered:Upgrade[] = []
+
   for (const stage of compiled.stages) {
     //When new stage begins we reset the context by clearing the _filtered marker
     dataset = [...upgrades]
@@ -96,16 +98,19 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
           ups = filterBest(ups, w._worst, true, w.negative === true)
         }
         for (const u of ups) {
+          if(!filtered.includes(u)){
+            filtered.push(u)
+          }
           u._filtered = true;
           if (rule.data.actions) {
             performActions(u, rule.data.actions)
           }
         }
       }
-
-
     }
   }
+
+  return filtered
 }
 
 function shortUpName(name: string) {

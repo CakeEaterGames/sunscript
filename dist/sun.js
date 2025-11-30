@@ -610,6 +610,7 @@ function(context,args){ //
     for (const k in Aliases) {
       aliases[k] = Aliases[k];
     }
+    let filtered = [];
     for (const stage of compiled.stages) {
       dataset = [...upgrades];
       for (const u of dataset) {
@@ -647,6 +648,9 @@ function(context,args){ //
             ups = filterBest(ups, w._worst, true, w.negative === true);
           }
           for (const u of ups) {
+            if (!filtered.includes(u)) {
+              filtered.push(u);
+            }
             u._filtered = true;
             if (rule.data.actions) {
               performActions(u, rule.data.actions);
@@ -655,6 +659,7 @@ function(context,args){ //
         }
       }
     }
+    return filtered;
   }
   function shortUpName(name) {
     return name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "");
