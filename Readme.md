@@ -10,7 +10,8 @@ Have fun everyone
 
 Sunscript is Domain Specific Language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) for an MMO game called [Hackmud](https://hackmud.com). It is designed to solve one and only one specific problem in the game, **filtering of loot (upgrades)**. When you get to a certain progression point at the game you start to acquire thousands of individual items of various rarities, tiers, types and qualities. Deciding what to do with each individual item by hand is no longer possible and any attempt to create a proper filtering solution ends up becomes a long list of "if else" statements that is very difficult to read and modify.
 
-The more you use it the more readable and comfortable it becomes!
+The more you use it the more readable and comfortable it becomes! 
+Try the [life demo](https://github.com/CakeEaterGames/sunscript)
 
 ## Usage
 
@@ -306,7 +307,8 @@ function getUpgradeValue(u) {
 
 ## Samples
 
-Wind the working samples in the "samples" dir
+Wind the working samples in the "samples" dir.
+Also try the [life demo](https://github.com/CakeEaterGames/sunscript)
 
 ## Contribute
 
