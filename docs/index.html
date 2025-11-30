@@ -4,6 +4,7 @@
 <head>
     <title>SUNSCRIPT</title>
     <script src="dataset.js"></script>
+    <script src="megafilter.js"></script>
     <script src="index.js"></script>
     <link rel="stylesheet" href="style.css">
     <script>
@@ -52,6 +53,12 @@
             container.appendChild(table);
         }
 
+        function loadMegafilter(){
+            let textarea = document.getElementById('sun_input');
+            textarea.textContent = window.megafilter
+            recompile() 
+        }
+
     </script>
 </head>
 
@@ -60,28 +67,24 @@
     <p>
         This is not my best frontend work by far. This will be prettyfied later.
     </p>
+    <p>
+        Press to load the megafilter!
+        <button onclick="loadMegafilter()" >LOAD</button>
+    </p>
 
     <textarea class="my_area" name="sun_input" id="sun_input">
-// This script sets a high price to all char_counts with chars >= 1500
-// Setts a lower price to all char_counts with chars >= 1460
-// Culls all other chars
-// Then it filters the best char counts and only keeps 3, overwriting the original keep flag
-// Every upgrade that got touched by the filter is displayed on the screen
-// Edit this and play around
-// You can start by typing * -> display
+
 
 alias c = char_count
-c[1500:*] -> keep price=10BGC;>    
-c[1460:*] -> sell price=1BGC;>  
-c         -> cull;>              
+c[1500:*] -> keep price=10BGC;>    // Keep all char_counts with 1500+ chars 
+c[1460:*] -> sell price=1BGC;>     // Sell all char_counts with 1460+ chars
+c         -> cull;>                // Destroy all other char_counts
 
-#1 c keep _best=3 -> the_best
-#1 c keep !the_best -> sell keep=undefined
+--- // Next stage 
 
-#1 c -> display
-
-//Uncomment this display ALL upgrades in this dataset
-//#1 * -> display
+c keep _best=3 -> the_best     
+c keep !the_best -> sell keep=undefined    // Only keep the best 3
+c -> display            // Display all char_counts 
     </textarea>
 
     <div id="table-container"></div>
