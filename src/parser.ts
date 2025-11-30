@@ -255,7 +255,9 @@ function parseAlias(): response<Alias> {
   t = consume(";");
   if (t.type == "error") return t;
 
-  return resp({ k, v });
+  //Yes, it is now the other way around to make multiple upgrades match the same alias
+  return resp({ v: k, k: v });
+  // return resp({ k, v });
 }
 
 function parseFilters(): response<Array<SUNFilter | LUNFilter>> {
@@ -353,7 +355,7 @@ function parseSUN(): response<SUNFilter> {
       advance()
 
       if (cur == '*') consume('*')
-      else if (cur == ' ') {}
+      else if (cur == ' ') { }
       else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
         r.rarity = Number(cur);
         advance()
@@ -364,14 +366,14 @@ function parseSUN(): response<SUNFilter> {
       r.alias = cur[0]
       advance()
       if (cur == '*') consume('*')
-      else if (cur == ' ') {}
+      else if (cur == ' ') { }
       else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
         r.tier = Number(cur);
         advance()
       }
 
       if (cur == '*') consume('*')
-      else if (cur == ' ') {}
+      else if (cur == ' ') { }
       else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
         r.rarity = Number(cur);
         advance()
