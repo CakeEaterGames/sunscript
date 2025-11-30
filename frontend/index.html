@@ -90,7 +90,7 @@ pp _filtered -> display
 
 
     <script>
-        let lib = SUN({import:true})
+        let lib = SUN({ import: true })
         console.log(SUN())
         console.log(dataset)
         for (const u of dataset) {
@@ -118,7 +118,7 @@ pp _filtered -> display
             displayed = displayed.filter((a) => a.display)
             lib.sortUpgrades(displayed)
 
-            createTable(displayed, 'table-container', ["i", "the_best", "name", "special", "keep", "sell", "cull", "price", "anomaly"])
+            createTable(displayed, 'table-container', ["i", "the_best", "name", "special", "snack", "keep", "sell", "cull", "price", "original", "material", "extra", "anomaly"])
 
         }
 

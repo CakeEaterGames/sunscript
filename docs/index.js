@@ -612,8 +612,8 @@
             triggered = true;
           }
         }
-        let b = (rule.filters || []).find((a) => a._best);
-        let w = (rule.filters || []).find((a) => a._worst);
+        let b = (rule.filters || []).find((a) => a._best !== undefined);
+        let w = (rule.filters || []).find((a) => a._worst !== undefined);
         if (b && typeof b._best == "number") {
           ups = filterBest(ups, b._best, false, b.negative === true);
         } else if (w && typeof w._worst == "number") {

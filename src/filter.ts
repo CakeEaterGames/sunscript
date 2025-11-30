@@ -81,8 +81,8 @@ export function filter(upgrades: Array<Upgrade>, compiled: program) {
         }
       }
 
-      let b = (rule.filters || []).find(a => a._best) //because ?. is broken
-      let w = (rule.filters || []).find(a => a._worst)
+      let b = (rule.filters || []).find(a => a._best!==undefined) //because ?. is broken
+      let w = (rule.filters || []).find(a => a._worst!==undefined)
 
       if (b && typeof b._best == "number") {
         ups = filterBest(ups, b._best, false, b.negative === true)
