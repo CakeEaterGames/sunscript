@@ -659,6 +659,9 @@ function(context,args){ //
         }
       }
     }
+    for (const u of upgrades) {
+      delete u._filtered;
+    }
     return filtered;
   }
   function shortUpName(name) {

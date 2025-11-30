@@ -110,6 +110,11 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
     }
   }
 
+  //cleanup
+  for (const u of upgrades) {
+    delete u._filtered;
+  }
+
   return filtered
 }
 
