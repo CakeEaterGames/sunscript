@@ -93,6 +93,9 @@ function(context,args){ //
   }
 
   // src/parser.ts
+  function expectedError(expected, got, prefix = "", postfix = "") {
+    return error(`${prefix}Expected any of ["${expected.join('", "')}"]. But recieved: "${got}". ${postfix}`);
+  }
   var tokens = [];
   var cur = tokens[0];
   var curI = 0;
@@ -138,8 +141,7 @@ function(context,args){ //
   function consume(v) {
     stackLog("consume " + v);
     if (cur != v) {
-      stackLog(`Expected ${v} but got ${cur}`);
-      return error(`Expected ${v} but got ${cur}`);
+      return expectedError([v], cur);
     }
     stackLog(`consumed`);
     let c = cur;
@@ -155,7 +157,6 @@ function(context,args){ //
     return { type: "success", value: v };
   }
   function error(e) {
-    stackLog("====Throwing and error");
     stackLog(e);
     return { type: "error", error: e };
   }
@@ -245,7 +246,7 @@ function(context,args){ //
     skipSpaces();
     let res = {};
     if (!isAlphaNum(cur))
-      return error("Property names must be alphanumeric. You provided " + cur);
+      return expectedError(["alphanumeric string"], cur, "Action error. ");
     let k = cur;
     advance();
     skipSpaces();
@@ -262,7 +263,7 @@ function(context,args){ //
       advance();
       return resp({ k, v });
     } else {
-      return error("Expected = or ; or space but got " + cur);
+      return expectedError("=; ".split(""), cur);
     }
   }
   function parseAlias() {
@@ -275,7 +276,7 @@ function(context,args){ //
       return t;
     skipSpaces();
     if (cur.length != 1)
-      return error("Aliases can only be single characters. Can't use " + cur);
+      return expectedError(["single alphanumeric character"], cur, "Alias error. ");
     let k = cur;
     advance();
     skipSpaces();
@@ -284,7 +285,7 @@ function(context,args){ //
       return t;
     skipSpaces();
     if (!isAlphaNum(cur))
-      return error("Upgrade names must be alphanumeric. You provided" + cur);
+      return expectedError(["alphanumeric string"], cur, "Alias error. ");
     let v = cur;
     advance();
     skipSpaces();
@@ -361,7 +362,7 @@ function(context,args){ //
       advance();
     }
     if (!isAlphaNum(cur) && cur != "*")
-      return error("SUN Rule Error. Expected an alias char, but got " + cur);
+      return expectedError(["alias char"], cur, "SUN Rule error. ");
     switch (cur.length) {
       case 3:
         {
@@ -379,7 +380,9 @@ function(context,args){ //
           if (!isNaN(Number(cur[1])))
             r.tier = Number(cur[1]);
           advance();
-          if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+          if (cur == "*")
+            consume("*");
+          else if (cur == " ") {} else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
             r.rarity = Number(cur);
             advance();
           }
@@ -389,18 +392,22 @@ function(context,args){ //
         {
           r.alias = cur[0];
           advance();
-          if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+          if (cur == "*")
+            consume("*");
+          else if (cur == " ") {} else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
             r.tier = Number(cur);
             advance();
           }
-          if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+          if (cur == "*")
+            consume("*");
+          else if (cur == " ") {} else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
             r.rarity = Number(cur);
             advance();
           }
         }
         break;
       default:
-        return error("SUN Rule Error. Expected an alias char, but got " + cur);
+        return expectedError(["alias char"], cur, "SUN Rule error. ");
     }
     if (r.alias == "*")
       r.alias = undefined;
@@ -416,7 +423,7 @@ function(context,args){ //
         return end;
     }
     if (cur != " " && cur != ";" && cur != "->") {
-      return error("SUN Rule Error. Expected -> or ; or space but got " + cur);
+      return expectedError(["->", ";", " "], cur, "SUN Rule error. ");
     }
     advance();
     if (r.loaded === undefined)
@@ -437,7 +444,7 @@ function(context,args){ //
     stackLog("parseLUN");
     let res = { type: "lun", negative: undefined };
     if (!isAlphaNum(cur)) {
-      return error("Property name must be alphanumeric. Got " + cur);
+      return expectedError(["alphanumeric string"], cur, "LUN Rule error. ");
     }
     let name = cur;
     advance();
@@ -458,7 +465,7 @@ function(context,args){ //
         res[name] = true;
         return resp(res);
       } else {
-        return error("Failed to parse LUN. Expected = or ; or -> or ! or space. Got " + cur);
+        return expectedError(["=", ";", "->", "!"], cur, "LUB Rule error. ");
       }
     }
   }
