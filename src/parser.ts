@@ -435,7 +435,7 @@ function parseLUN(): response<LUNFilter> {
       res[name] = true;
       return resp(res)
     } else {
-      return error("Failed to parse LUN. Expected = or ; or -> or ! or space. Got " + cur)
+      return error("Failed to parse LUN. Expected = or ; or -> or !. Got " + cur)
     }
 
   }
