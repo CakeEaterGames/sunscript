@@ -351,22 +351,32 @@ function parseSUN(): response<SUNFilter> {
       r.alias = cur[0]
       if (!isNaN(Number(cur[1]))) r.tier = Number(cur[1])
       advance()
-      if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+
+      if (cur == '*') consume('*')
+      else if (cur == ' ') {}
+      else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
         r.rarity = Number(cur);
         advance()
       }
+
     } break;
     case 1: {
       r.alias = cur[0]
       advance()
-      if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+      if (cur == '*') consume('*')
+      else if (cur == ' ') {}
+      else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
         r.tier = Number(cur);
         advance()
       }
-      if (cur != " " && (cur + "").length == 1 && !isNaN(Number(cur))) {
+
+      if (cur == '*') consume('*')
+      else if (cur == ' ') {}
+      else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
         r.rarity = Number(cur);
         advance()
       }
+
 
     } break;
     default: return expectedError(["alias char"], cur, "SUN Rule error. ") as response<SUNFilter>
@@ -375,6 +385,8 @@ function parseSUN(): response<SUNFilter> {
 
   if (r.alias == "*") r.alias = undefined;
 
+  // DON'T
+  // skipSpaces()
 
   if (cur == "[") {
     consume("[")
