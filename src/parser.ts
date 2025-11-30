@@ -2,15 +2,11 @@ import { lex } from "./lexer"
 import { Action, Alias, commonTypes, LUNFilter, range, Rule, SUNFilter } from "./types";
 import { isAlphaNum } from "./utils"
 
+function expectedError(expected: string[], got: string, prefix = "", postfix = "") {
 
-/*
-c[1500:*] -> keep price=10BGC;>
-c[1400:*] -> sell price=1BGC;>
-c -> cull;>
-
-pp c keep _best=3 -> the_best
-pp c -> display
-*/
+  return error<undefined>(`${prefix}Expected any of ["${expected.join('", "')}"]. But recieved: "${got}". ${postfix}`)
+  // return error<undefined>(`${prefix}Expected ${expected.length > 1 ? "any of " : ""} ["${expected.join('", "')}"]. But recieved: "${got}". ${postfix}`)
+}
 
 type savestate = {
   cur: string,
@@ -79,8 +75,7 @@ function load(a: savestate) {
 function consume(v: string): response<undefined> {
   stackLog("consume " + v)
   if (cur != v) {
-    stackLog(`Expected ${v} but got ${cur}`)
-    return error(`Expected ${v} but got ${cur}`)
+    return expectedError([v], cur)
   }
   stackLog(`consumed`)
   let c = cur
@@ -99,7 +94,6 @@ function resp<T>(v: T): response<T> {
 }
 
 function error<T>(e: any): response<T> {
-  stackLog("====Throwing and error")
   stackLog(e)
   return { type: "error", error: e }
 }
@@ -204,7 +198,9 @@ function parseAction(): response<Action> {
   skipSpaces();
   let res = {}
 
-  if (!isAlphaNum(cur)) return error("Property names must be alphanumeric. You provided " + cur)
+  if (!isAlphaNum(cur))
+    return expectedError(["alphanumeric string"], cur, "Action error. ") as response<Action>
+
   let k = cur
   advance();
   skipSpaces()
@@ -224,7 +220,7 @@ function parseAction(): response<Action> {
     advance();
     return resp({ k, v })
   } else {
-    return error("Expected = or ; or space but got " + cur)
+    return expectedError("=; ".split(''), cur) as response<Action>
   }
 }
 
@@ -239,7 +235,8 @@ function parseAlias(): response<Alias> {
   if (t.type == "error") return t;
   skipSpaces();
 
-  if (cur.length != 1) return error("Aliases can only be single characters. Can't use " + cur)
+  if (cur.length != 1)
+    return expectedError(["single alphanumeric character"], cur, "Alias error. ") as response<Alias>
   let k = cur
   advance();
   skipSpaces();
@@ -248,7 +245,9 @@ function parseAlias(): response<Alias> {
   if (t.type == "error") return t;
   skipSpaces();
 
-  if (!isAlphaNum(cur)) return error("Upgrade names must be alphanumeric. You provided" + cur)
+  if (!isAlphaNum(cur))
+    return expectedError(["alphanumeric string"], cur, "Alias error. ") as response<Alias>
+
   let v = cur
   advance();
   skipSpaces();
@@ -337,7 +336,9 @@ function parseSUN(): response<SUNFilter> {
     advance()
   }
 
-  if (!isAlphaNum(cur) && cur != "*") return error("SUN Rule Error. Expected an alias char, but got " + cur)
+  if (!isAlphaNum(cur) && cur != "*")
+    return expectedError(["alias char"], cur, "SUN Rule error. ") as response<SUNFilter>
+
 
   switch (cur.length) {
     case 3: {
@@ -368,7 +369,8 @@ function parseSUN(): response<SUNFilter> {
       }
 
     } break;
-    default: return error("SUN Rule Error. Expected an alias char, but got " + cur);
+    default: return expectedError(["alias char"], cur, "SUN Rule error. ") as response<SUNFilter>
+
   }
 
   if (r.alias == "*") r.alias = undefined;
@@ -388,7 +390,7 @@ function parseSUN(): response<SUNFilter> {
   }
 
   if (cur != ' ' && cur != ';' && cur != '->') {
-    return error("SUN Rule Error. Expected -> or ; or space but got " + cur);
+    return expectedError(["->", ";", " "], cur, "SUN Rule error. ") as response<SUNFilter>
   }
   advance()
 
@@ -412,7 +414,7 @@ function parseLUN(): response<LUNFilter> {
 
   let res: LUNFilter = { type: "lun", negative: undefined }
   if (!isAlphaNum(cur)) {
-    return error("Property name must be alphanumeric. Got " + cur)
+    return expectedError(["alphanumeric string"], cur, "LUN Rule error. ") as response<LUNFilter>
   }
   let name = cur;
   advance()
@@ -435,7 +437,7 @@ function parseLUN(): response<LUNFilter> {
       res[name] = true;
       return resp(res)
     } else {
-      return error("Failed to parse LUN. Expected = or ; or -> or !. Got " + cur)
+      return expectedError(["=", ";", "->", "!"], cur, "LUB Rule error. ") as response<LUNFilter>
     }
 
   }
