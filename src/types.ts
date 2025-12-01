@@ -1,3 +1,14 @@
+export type Upgrade = {
+  i:number,
+  sn:"string",
+  name: string,
+  rarity: number,
+  tier: number,
+  cooldown?: number,
+  [key: string]: commonTypes,
+}
+
+
 export type commonTypes = string | boolean | undefined | number;
 
 export type Program = {

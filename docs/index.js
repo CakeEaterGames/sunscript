@@ -812,7 +812,10 @@
     if (an == "k3y" && a.k3y != b.k3y) {
       return 0;
     }
-    return bq - aq;
+    if (bq != aq)
+      return bq - aq;
+    return a.sn.localeCompare(b.sn);
+    return 0;
   }
   function filterBest(ups, count, worst, negative) {
     ups.sort(compareQuality);

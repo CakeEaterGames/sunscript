@@ -1,4 +1,4 @@
-import { Action, commonTypes, Filter, Program, range, Rule } from "./types";
+import { Action, commonTypes, Filter, Program, range, Rule, Upgrade } from "./types";
 
 
 export const Aliases: Record<string, string> = {
@@ -39,13 +39,7 @@ export const Aliases: Record<string, string> = {
   "r": "w4rn_er",
 };
 
-type Upgrade = {
-  name: string,
-  rarity: number,
-  tier: number,
-  cooldown?: number,
-  [key: string]: commonTypes,
-}
+
 
 let aliases: typeof Aliases
 
@@ -261,7 +255,12 @@ export function compareQuality(a: Upgrade, b: Upgrade) {
   if (an == 'k3y' && a.k3y != b.k3y) {
     return 0;
   }
-  return bq - aq;
+
+  if (bq != aq) return bq - aq;
+
+  return a.sn.localeCompare(b.sn)
+  
+  return 0;
 }
 
 function filterBest(ups: Upgrade[], count: number, worst: boolean, negative: boolean): Upgrade[] {
