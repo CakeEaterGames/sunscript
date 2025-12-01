@@ -317,7 +317,7 @@ function parseSUN(): response<SUNFilter> {
   stackLog("parseSUN")
 
   let r: SUNFilter = {
-    type: "sun",
+    filterType: "sun",
     negative: undefined,
     loaded: undefined,
     ready: undefined,
@@ -432,7 +432,7 @@ function parseSUN(): response<SUNFilter> {
 function parseLUN(): response<LUNFilter> {
   stackLog("parseLUN")
 
-  let res: LUNFilter = { type: "lun", negative: undefined }
+  let res: LUNFilter = { filterType: "lun", negative: undefined }
   if (!isAlphaNum(cur)) {
     return expectedError(["alphanumeric string"], cur, "LUN Rule error. ") as response<LUNFilter>
   }

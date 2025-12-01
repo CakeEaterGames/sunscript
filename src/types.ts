@@ -29,7 +29,7 @@ export type Rule = {
     actions?: Array<Action>;
 }
 export type SUNFilter = {
-    type: "sun"
+    filterType: "sun"
     negative?: boolean;
     loaded?: boolean;
     ready?: boolean;
@@ -40,7 +40,7 @@ export type SUNFilter = {
     [key: string]: range | commonTypes;
 }
 export type LUNFilter = {
-    type: "lun";
+    filterType: "lun";
     negative?: boolean;
     _best?: number;
     _worst?: number;

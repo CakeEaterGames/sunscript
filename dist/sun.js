@@ -348,7 +348,7 @@ function(context,args){ //
   function parseSUN() {
     stackLog("parseSUN");
     let r = {
-      type: "sun",
+      filterType: "sun",
       negative: undefined,
       loaded: undefined,
       ready: undefined,
@@ -452,7 +452,7 @@ function(context,args){ //
   }
   function parseLUN() {
     stackLog("parseLUN");
-    let res = { type: "lun", negative: undefined };
+    let res = { filterType: "lun", negative: undefined };
     if (!isAlphaNum(cur)) {
       return expectedError(["alphanumeric string"], cur, "LUN Rule error. ");
     }
@@ -786,7 +786,7 @@ function(context,args){ //
   function filterOneUpgrade(u, filters) {
     for (const f of filters) {
       let negative = f.negative == true;
-      if (f.type == "sun") {
+      if (f.filterType == "sun") {
         if (f.alias && !matchAlias(u, f.alias) !== negative)
           return false;
         if (f.ready != null && f.ready != upReady(u) !== negative)
@@ -795,7 +795,7 @@ function(context,args){ //
           return false;
       }
       for (const k in f) {
-        if (["_best", "_worst", "alias", "ready", "value", "next_stage", "type"].includes(k))
+        if (["_best", "_worst", "alias", "ready", "value", "next_stage", "filterType"].includes(k))
           continue;
         const v = f[k];
         if (v != null && !inRangeOrValue(u[k], v) !== negative)

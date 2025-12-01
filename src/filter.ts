@@ -231,14 +231,14 @@ function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
   for (const f of filters) {
     let negative = f.negative == true;
 
-    if (f.type == "sun") {
+    if (f.filterType == "sun") {
       if (f.alias && !matchAlias(u, f.alias) !== negative) return false
       if (f.ready != undefined && ((f.ready != upReady(u)) !== negative)) return false;
       if (f.value != undefined && ((!inRangeOrValue(getUpgradeValue(u), f.value)) !== negative)) return false;
     }
 
     for (const k in f) {
-      if (["_best", "_worst", "alias", "ready", "value", "next_stage", "type"].includes(k)) continue;
+      if (["_best", "_worst", "alias", "ready", "value", "next_stage", "filterType"].includes(k)) continue;
       const v = f[k];
       if (v != undefined && ((!inRangeOrValue(u[k], v)) !== negative)) return false;
     }
@@ -259,7 +259,7 @@ export function compareQuality(a: Upgrade, b: Upgrade) {
   if (bq != aq) return bq - aq;
 
   return a.sn.localeCompare(b.sn)
-  
+
   return 0;
 }
 
