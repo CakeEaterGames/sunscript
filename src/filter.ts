@@ -119,6 +119,7 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
 }
 
 function shortUpName(name: string) {
+  if(!name) return name
   return name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "")
 }
 

@@ -665,6 +665,8 @@ function(context,args){ //
     return filtered;
   }
   function shortUpName(name) {
+    if (!name)
+      return name;
     return name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "");
   }
   function getUpgradeValue(u) {
