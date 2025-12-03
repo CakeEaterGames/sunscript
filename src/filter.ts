@@ -42,13 +42,38 @@ export const Aliases: Record<string, string> = {
 
 
 
+function keepMatched<T>(
+  set: Set<T>,
+  predicate: (value: T) => boolean
+): Set<T> {
+  if (set.size === 0) return new Set();
+
+  // set.forEach(value => {
+  //   if (!predicate(value)) {
+  //     set.delete(value);
+  //   }
+  // });
+  // return set;
+
+  let res = new Set<T>
+  set.forEach(value => {
+    if (predicate(value)) {
+      res.add(value);
+    }
+  });
+
+  return res
+}
+
+
 let aliases: typeof Aliases
 
 
-let dataset: Upgrade[];
+let dataset = new Set<Upgrade>()
+// let dataset: Upgrade[];
 
 
-export function compileAndFilter(upgrades: Array<Upgrade>, src: string){
+export function compileAndFilter(upgrades: Array<Upgrade>, src: string) {
   return filter(upgrades, compile(src))
 }
 
@@ -58,18 +83,20 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
     aliases[k] = Aliases[k]
   }
 
-  let filtered: Upgrade[] = []
+
+  let filtered = new Set<Upgrade>()
 
   for (const stage of compiled.stages) {
     //When new stage begins we reset the context by clearing the _filtered marker
-    dataset = [...upgrades]
+    dataset = new Set(upgrades)
     for (const u of dataset) {
       delete u._filtered;
     }
     for (const rule of stage) {
       if (rule.type == "return") {
-        dataset = dataset.filter(a => !a._filtered)
-        if (dataset.length == 0) break;
+        dataset = keepMatched(dataset, a => !a._filtered)
+        // dataset = dataset.filter(a => !a._filtered)
+        if (dataset.size == 0) break;
         continue;
       }
       if (rule.type == "alias") {
@@ -78,29 +105,60 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
       }
       if (rule.type = "rule") {
         if (!rule.data) throw Error("Wtf?")
+        // let ups = new Set<Upgrade>(dataset)
+        // if (rule.data.filters !== undefined) {
+        //   let filters = rule.data.filters
+        //   ups = keepMatched(ups, a => filterOneUpgrade(a, filters))
+
+        //   let b = filters.find(a => a._best !== undefined)
+        //   let w = filters.find(a => a._worst !== undefined)
+
+        //   // if (b && typeof b._best == "number") {
+        //   //   ups = new Set(filterBest(new Array(...ups), b._best, false, b.negative === true))
+        //   // } else if (w && typeof w._worst == "number") {
+        //   //   ups =  new Set(filterBest(new Array(...ups), w._worst, false, w.negative === true))
+        //   // }
+
+
+        //   if (b && typeof b._best == "number") {
+        //     ups = filterBest3(ups, b._best, false, b.negative === true)
+        //   } else if (w && typeof w._worst == "number") {
+        //     ups = filterBest3(ups, w._worst, false, w.negative === true)
+        //   }
+
+        // }
+
+
         let ups: Upgrade[] = []
-        for (const u of dataset) {
-          if (!rule.data.filters) {
-            ups.push(u)
-            continue;
+        if (rule.data.filters !== undefined) {
+          let filters = rule.data.filters
+          for (const u of dataset) {
+            if (!filters) {
+              ups.push(u)
+              continue;
+            }
+            if (filterOneUpgrade(u, rule.data!.filters)) {
+              ups.push(u)
+            }
           }
-          if (filterOneUpgrade(u, rule.data!.filters)) {
-            ups.push(u)
+
+          let b = filters.find(a => a._best !== undefined)
+          let w = filters.find(a => a._worst !== undefined)
+
+          if (b && typeof b._best == "number") {
+            ups = filterBest(ups, b._best, false, b.negative === true)
+          } else if (w && typeof w._worst == "number") {
+            ups = filterBest(ups, w._worst, true, w.negative === true)
           }
         }
 
-        let b = (rule.data.filters || []).find(a => a._best !== undefined) //because ?. is broken
-        let w = (rule.data.filters || []).find(a => a._worst !== undefined)
 
-        if (b && typeof b._best == "number") {
-          ups = filterBest(ups, b._best, false, b.negative === true)
-        } else if (w && typeof w._worst == "number") {
-          ups = filterBest(ups, w._worst, true, w.negative === true)
-        }
+
+
         for (const u of ups) {
-          if (!filtered.includes(u)) {
-            filtered.push(u)
-          }
+
+          filtered.add(u)
+
           u._filtered = true;
           if (rule.data.actions) {
             performActions(u, rule.data.actions)
@@ -273,6 +331,126 @@ export function compareQuality(a: Upgrade, b: Upgrade) {
 
   return 0;
 }
+
+function filterBest3(ups: Set<Upgrade>, count: number, worst: boolean, negative: boolean): Set<Upgrade> {
+  const upgradesArray = Array.from(ups);
+
+  if (upgradesArray.length <= count) {
+    const result = new Set<Upgrade>();
+    if (negative) {
+      return result;
+    } else {
+      upgradesArray.forEach(up => result.add(up));
+      return result;
+    }
+  }
+
+  // Find top/bottom 'count' items using partial sorting
+  const comparator = (a: Upgrade, b: Upgrade) => {
+    const c = compareQuality(a, b);
+    return worst ? -c : c;
+  };
+
+  // Quickselect algorithm to find top/bottom 'count' items
+  const selected = quickSelect(upgradesArray, count, comparator);
+
+  const result = new Set<Upgrade>();
+
+  if (negative) {
+    // Keep everything except the selected items
+    const selectedSet = new Set(selected);
+    upgradesArray.forEach(up => {
+      if (!selectedSet.has(up)) {
+        result.add(up);
+      }
+    });
+  } else {
+    // Keep only the selected items
+    selected.forEach(up => result.add(up));
+  }
+
+  return result;
+}
+// Quickselect implementation for partial sorting
+function quickSelect<T>(arr: T[], k: number, comparator: (a: T, b: T) => number): T[] {
+  if (arr.length <= k) return arr;
+
+  const result: T[] = [];
+  const arrCopy = [...arr];
+
+  while (result.length < k) {
+    const pivotIndex = Math.floor(Math.random() * arrCopy.length);
+    const pivot = arrCopy[pivotIndex];
+
+    const left: T[] = [];
+    const right: T[] = [];
+    const equal: T[] = [];
+
+    for (const item of arrCopy) {
+      const cmp = comparator(item, pivot);
+      if (cmp < 0) {
+        left.push(item);
+      } else if (cmp > 0) {
+        right.push(item);
+      } else {
+        equal.push(item);
+      }
+    }
+
+    // Check where our k items are
+    if (result.length + left.length > k) {
+      // Need to look in left partition
+      arrCopy.length = 0;
+      arrCopy.push(...left);
+    } else if (result.length + left.length + equal.length >= k) {
+      // Add left + needed from equal
+      result.push(...left);
+      const neededFromEqual = k - result.length;
+      result.push(...equal.slice(0, neededFromEqual));
+      break;
+    } else {
+      // Add left + all equal, continue with right
+      result.push(...left, ...equal);
+      arrCopy.length = 0;
+      arrCopy.push(...right);
+    }
+  }
+
+  return result;
+}
+
+
+
+function filterBest2(ups: Set<Upgrade>, count: number, worst: boolean, negative: boolean) {
+
+
+  let newUps = new Set<Upgrade>()
+  let m: Upgrade
+
+  let iterator = ups.entries()
+  for (let i = 0; i < count; i++) {
+    do {
+      m = iterator.next().value?.[0]!
+    } while (newUps.has(m))
+    if (!m) {
+      break;
+    }
+    let best = m
+    for (const u of ups) {
+      let c = compareQuality(m, u);
+      if (c != 0 && (c > 0 !== worst)) {
+        best = u;
+      }
+    }
+    newUps.add(best)
+  }
+
+  ups.forEach(a => {
+    if (newUps.has(a) !== negative) ups.delete(a)
+  })
+
+}
+
 
 function filterBest(ups: Upgrade[], count: number, worst: boolean, negative: boolean): Upgrade[] {
   ups.sort(compareQuality)

@@ -1,5 +1,6 @@
 (()=>{
     let code = `
+
 // Snax block
 
 alias S = ez_21
@@ -21,10 +22,10 @@ snack _best=128 -> keep
 ---
 
 alias x = CON_TELL
--x _best=10 -> keep;>; -x !keep -> cull;>
+-x _best=20 -> keep;>; -x !keep -> cull;>
 
 alias x = CON_SPEC
--x _best=10 -> keep;>
+-x _best=20 -> keep;>
 
 alias x = acct_nt
 -x _best=20 -> keep;>
@@ -36,16 +37,16 @@ alias x = magnara
 -x _best=20 -> keep;>
 
 alias x = char_count
+-x2 _best=30 -> keep;>
+-x3 _best=30 -> keep;>
+
+alias x = public_script
 -x2 _best=20 -> keep;>
 -x3 _best=20 -> keep;>
 
-alias x = public_script
--x2 _best=10 -> keep;>
--x3 _best=10 -> keep;>
-
 alias x = script_slot
--x2 _best=10 -> keep;>
--x3 _best=10 -> keep;>
+-x2 _best=20 -> keep;>
+-x3 _best=20 -> keep;>
 
 alias x = channel_count
 -x _best=20 -> keep;>
@@ -116,44 +117,44 @@ alias x = l0ckjaw
 
 alias k = k3y
 
-k[vc2c7q] rarity=0:1 _best=3 -> original
-k[tvfkyq] rarity=0:1 _best=3 -> original
-k[xwz7ja] rarity=0:1 _best=3 -> original
-k[uphlaw] rarity=0:1 _best=3 -> original
-k[sa23uw] rarity=0:1 _best=3 -> original
-k[72umy0] rarity=0:1 _best=3 -> original
-k[cmppiq] rarity=0:1 _best=3 -> original
-k[i874y3] rarity=0:1 _best=3 -> original
-k[eoq6de] rarity=0:1 _best=3 -> original
-k[9p65cu] rarity=0:1 _best=3 -> original
-k[6hh8xw] rarity=0:1 _best=3 -> original
-k[pmvr1q] rarity=0:1 _best=3 -> original
-k[fr8ibu] rarity=0:1 _best=3 -> original
-k[ellux0] rarity=0:1 _best=3 -> original
-k[xfnkqe] rarity=0:1 _best=3 -> original
-k[y111qa] rarity=0:1 _best=3 -> original
+-k[vc2c7q] rarity=0:1 _best=3 -> original
+-k[tvfkyq] rarity=0:1 _best=3 -> original
+-k[xwz7ja] rarity=0:1 _best=3 -> original
+-k[uphlaw] rarity=0:1 _best=3 -> original
+-k[sa23uw] rarity=0:1 _best=3 -> original
+-k[72umy0] rarity=0:1 _best=3 -> original
+-k[cmppiq] rarity=0:1 _best=3 -> original
+-k[i874y3] rarity=0:1 _best=3 -> original
+-k[eoq6de] rarity=0:1 _best=3 -> original
+-k[9p65cu] rarity=0:1 _best=3 -> original
+-k[6hh8xw] rarity=0:1 _best=3 -> original
+-k[pmvr1q] rarity=0:1 _best=3 -> original
+-k[fr8ibu] rarity=0:1 _best=3 -> original
+-k[ellux0] rarity=0:1 _best=3 -> original
+-k[xfnkqe] rarity=0:1 _best=3 -> original
+-k[y111qa] rarity=0:1 _best=3 -> original
 
-k[hc3b69] rarity=0:1 _best=3 -> original
-k[5c7e1r] rarity=0:1 _best=3 -> original
-k[4jitu5] rarity=0:1 _best=3 -> original
-k[lq09tg] rarity=0:1 _best=3 -> original
-k[vthf6e] rarity=0:1 _best=3 -> original
-k[nfijix] rarity=0:1 _best=3 -> original
-k[nyi5u2] rarity=0:1 _best=3 -> original
-k[voon2h] rarity=0:1 _best=3 -> original
-k[j1aa4n] rarity=0:1 _best=3 -> original
-k[d9j270] rarity=0:1 _best=3 -> original
-k[vzdt6m] rarity=0:1 _best=3 -> original
-k[cy70mo] rarity=0:1 _best=3 -> original
-k[8izsag] rarity=0:1 _best=3 -> original
-k[hzqgw6] rarity=0:1 _best=3 -> original
-k[qvgtnt] rarity=0:1 _best=3 -> original
-k[ooilt2] rarity=0:1 _best=3 -> original
+-k[hc3b69] rarity=0:1 _best=3 -> original
+-k[5c7e1r] rarity=0:1 _best=3 -> original
+-k[4jitu5] rarity=0:1 _best=3 -> original
+-k[lq09tg] rarity=0:1 _best=3 -> original
+-k[vthf6e] rarity=0:1 _best=3 -> original
+-k[nfijix] rarity=0:1 _best=3 -> original
+-k[nyi5u2] rarity=0:1 _best=3 -> original
+-k[voon2h] rarity=0:1 _best=3 -> original
+-k[j1aa4n] rarity=0:1 _best=3 -> original
+-k[d9j270] rarity=0:1 _best=3 -> original
+-k[vzdt6m] rarity=0:1 _best=3 -> original
+-k[cy70mo] rarity=0:1 _best=3 -> original
+-k[8izsag] rarity=0:1 _best=3 -> original
+-k[hzqgw6] rarity=0:1 _best=3 -> original
+-k[qvgtnt] rarity=0:1 _best=3 -> original
+-k[ooilt2] rarity=0:1 _best=3 -> original
 
-k[afgny5] rarity=0:1 _best=3 -> original
-k[54r1cg] rarity=0:1 _best=3 -> original
-k[dwwf3w] rarity=0:1 _best=3 -> original
-k[7oxb1b] rarity=0:1 _best=3 -> original
+-k[afgny5] rarity=0:1 _best=3 -> original
+-k[54r1cg] rarity=0:1 _best=3 -> original
+-k[dwwf3w] rarity=0:1 _best=3 -> original
+-k[7oxb1b] rarity=0:1 _best=3 -> original
 
 //Don't know about other t3 k3ys.
 //This data may be fake!
@@ -192,8 +193,8 @@ k[j1aa4n] rarity=2:* !_best=10 -> extra
 k[d9j270] rarity=2:* !_best=10 -> extra 
 k[vzdt6m] rarity=2:* !_best=10 -> extra 
 
-k original extra -> original=undefined
-k material extra -> material=undefined
+k original extra -> !original
+k material extra -> !material
 
 k original -> keep
 k material -> keep
@@ -203,7 +204,6 @@ k extra -> sell
 
 //Price list
 *1 !name=k3y !snack -> price=0GC
-snack -> price=10MGC
 
 ---
 
@@ -349,7 +349,7 @@ alias x = expose_upgrade_log
 x -> price=1MGC;>
 x -> price=0GC;>
 
- 
+
 ---
 
 
@@ -405,18 +405,48 @@ k price=undefined -> price=1QGC barter
 
 ---
 
-//DO NOT SELL UPGRADES THAT ARE TOO GOOD
-* barter -> sell=undefined
+snack -> price=10MGC
+
+
 
 //Sell everything worth selling
 * !keep price=0GC -> cull
 * !keep !price=0GC -> sell
 
+//DO NOT SELL UPGRADES THAT ARE TOO GOOD
+* barter -> !sell
+
 //If for some reason something got past the filter, mark it
 * !keep !sell !cull -> anomaly
 
 //If trying to sell something without a price, don't
-* sell price=undefined -> sell=false price="NO PRICE!!!!!!"
+* sell price=undefined -> !sell price="NO PRICE!!!!!!"
+
+---
+
+Now we sort items between users
+
+-k3         -> send=4;>
+-k original -> send=2;>
+-k material -> send=4;>
+-* snack    -> send=4;>
+-*2 barter  -> send=2;>
+
+-*2 -> send=4;>
+-*3 -> send=4;>
+-*4 -> send=4;>
+
+---
+
+// is_manual -> !send;>
+sell      -> !send;>
+cull      -> !send;>
+
+// send=2 user_tier=2 -> !send;>
+// send=3 user_tier=3 -> !send;>
+// send=4 user_tier=4 -> !send;>
+
+---
 
 * -> display
 `
