@@ -204,7 +204,13 @@ function parseAction(): response<Action> {
   stackLog("parseAction")
 
   skipSpaces();
-  let res = {}
+
+  let setToUndefined = false;
+  if (cur == "!") {
+    setToUndefined = true;
+    advance();
+    skipSpaces();
+  }
 
   if (!isAlphaNum(cur))
     return expectedError(["alphanumeric string"], cur, "Action error. ") as response<Action>
@@ -214,7 +220,12 @@ function parseAction(): response<Action> {
   skipSpaces()
 
   if (isAlphaNum(cur) || cur == ';') {
-    let v = true
+    let v : boolean | "undefined" = true
+
+    if (setToUndefined) {
+      v = "undefined"; //YES like that
+    }
+
     return resp({ k, v })
   } else if (cur == '=') {
     advance();

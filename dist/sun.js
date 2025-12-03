@@ -254,7 +254,12 @@ function(context,args){ //
   function parseAction() {
     stackLog("parseAction");
     skipSpaces();
-    let res = {};
+    let setToUndefined = false;
+    if (cur == "!") {
+      setToUndefined = true;
+      advance();
+      skipSpaces();
+    }
     if (!isAlphaNum(cur))
       return expectedError(["alphanumeric string"], cur, "Action error. ");
     let k = cur;
@@ -262,6 +267,9 @@ function(context,args){ //
     skipSpaces();
     if (isAlphaNum(cur) || cur == ";") {
       let v = true;
+      if (setToUndefined) {
+        v = "undefined";
+      }
       return resp({ k, v });
     } else if (cur == "=") {
       advance();

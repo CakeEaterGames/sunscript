@@ -144,6 +144,14 @@ c -> good=true
 c -> good 
 ```
 
+These 2 Actions do the same thing. Set property "good" to undefined
+```
+c -> good=undefined
+c -> !good 
+```
+
+
+
 #### LUN filter
 
 LUN filter (Long upgrade notations) is a set of key value pairs that define an upgrade
