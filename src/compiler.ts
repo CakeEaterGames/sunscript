@@ -36,3 +36,4 @@ export function compile(input: string): Program {
 
   return res
 }
+

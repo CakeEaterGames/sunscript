@@ -58,6 +58,19 @@ SUNSCRIPT CAN'T be used as:
 - A general purpose language. (I dare you to write Fibonacci in it tho. I'll give 50BGC if you do) 
 - A full replacement of your logic. It will get you 90% of the way there, but you'll still need to do the final steps yourself.
 
+## Library functions
+
+| name              | arguments                               | returns          | description                                                                              |
+| ----------------- | --------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------- |
+| compile           | src : string                            | program          | Compile the SUN program into a reusable JSON objec                                       |
+| filter            | upgrades : object[], compiled : program | object[]         | Filter and modify the upgrades array using the compiled program                          |
+| compileAndFilter  | upgrades : object[], src : string       | object[]         | combination of prior 2 methods                                                           |
+| sortUpgrades      | upgrades : object[]                     | object[]         | sorts an array of upgrades with my personal preffered order                              |
+| getUpgradeValue   | object                                  | number \| string | returns an upgrade value that is used for filtering in SUN filters                       |
+| getUpgradeQuality | object                                  | number           | returns a numeric value of upgrade. Value can be negative, e.g. upgrades with cooldowns. |
+| Aliases           | N/A                                     | N/A              | Dictionary object of aliases                                                             |
+
+
 ## Syntax
 
 Here are all the building blocks of the language:
@@ -323,3 +336,4 @@ Also try the [live demo](https://cakeeatergames.github.io/sunscript/)
 ## Contribute
 
 If you want to contribute you can fork this repository and create a merge request. Or find me on discord in the official Hackmud server. Suggestions are always appreciated.
+
