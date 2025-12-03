@@ -1,3 +1,4 @@
+import { compile } from "./compiler";
 import { Action, commonTypes, Filter, Program, range, Rule, Upgrade } from "./types";
 
 
@@ -45,6 +46,11 @@ let aliases: typeof Aliases
 
 
 let dataset: Upgrade[];
+
+
+export function compileAndFilter(upgrades: Array<Upgrade>, src: string){
+  return filter(upgrades, compile(src))
+}
 
 export function filter(upgrades: Array<Upgrade>, compiled: Program) {
   aliases = {}
@@ -297,3 +303,6 @@ export function sortUpgrades(ups: Upgrade[]) {
     return 0
   })
 }
+
+
+

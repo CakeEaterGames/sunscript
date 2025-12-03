@@ -603,6 +603,9 @@
   };
   var aliases;
   var dataset;
+  function compileAndFilter(upgrades, src) {
+    return filter(upgrades, compile(src));
+  }
   function filter(upgrades, compiled) {
     aliases = {};
     for (const k in Aliases) {
@@ -865,7 +868,15 @@
   // src/index.ts
   function SUN(args) {
     if (args && args.import === true)
-      return { compile, filter, sortUpgrades, getUpgradeValue, getUpgradeQuality, Aliases };
+      return {
+        compile,
+        filter,
+        compileAndFilter,
+        sortUpgrades,
+        getUpgradeValue,
+        getUpgradeQuality,
+        Aliases
+      };
     let comment = "//";
     let a = `    'J╔══════════════════════════════════════════════════════════════╗'    
     'J║'  cake.sun - Short Upgrade Notation                           'J║'   
