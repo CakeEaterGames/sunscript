@@ -48,7 +48,11 @@ let aliases: typeof Aliases
 let dataset: Upgrade[];
 
 
-export function compileAndFilter(upgrades: Array<Upgrade>, src: string){
+export function compileAndFilterStages(upgrades: Array<Upgrade>, src: string) {
+  filter(upgrades, compile(src))
+}
+
+export function compileAndFilter(upgrades: Array<Upgrade>, src: string) {
   return filter(upgrades, compile(src))
 }
 
@@ -118,9 +122,18 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
   return filtered
 }
 
+
+
+
+let shortNameCache: { [key: string]: string } = {}
+
 function shortUpName(name: string) {
-  return name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "")
+  if (name in shortNameCache) return shortNameCache[name]
+  const a = name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "")
+  shortNameCache[name] = a;
+  return a
 }
+
 
 export function getUpgradeValue(u: Upgrade): number | string {
   if (!u.name) return 0

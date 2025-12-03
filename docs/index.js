@@ -673,8 +673,13 @@
     }
     return filtered;
   }
+  var shortNameCache = {};
   function shortUpName(name) {
-    return name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "");
+    if (name in shortNameCache)
+      return shortNameCache[name];
+    const a = name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "");
+    shortNameCache[name] = a;
+    return a;
   }
   function getUpgradeValue(u) {
     if (!u.name)
