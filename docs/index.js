@@ -663,11 +663,11 @@
     return filtered;
   }
   function shortUpName(name) {
-    if (!name)
-      return name;
     return name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "");
   }
   function getUpgradeValue(u) {
+    if (!u.name)
+      return 0;
     let n = shortUpName(u.name);
     let dict = {
       k3y: u.k3y,
@@ -702,8 +702,12 @@
     return 0;
   }
   function getUpgradeQuality(u) {
+    if (!u.name)
+      return 0;
     let n = shortUpName(u.name);
     if (n == "k3y") {
+      if (!u.rarity)
+        return 0;
       if (u.rarity == 0)
         return 3;
       if (u.rarity == 1)
@@ -776,6 +780,8 @@
     return false;
   }
   function matchAlias(u, alias) {
+    if (!u.name)
+      return false;
     let n = shortUpName(u.name);
     if (aliases[alias] == n)
       return true;
@@ -803,6 +809,10 @@
     return true;
   }
   function compareQuality(a, b) {
+    if (!a.name)
+      return 0;
+    if (!b.name)
+      return 0;
     let an = shortUpName(a.name);
     let bn = shortUpName(b.name);
     let aq = getUpgradeQuality(a);
@@ -814,7 +824,8 @@
     }
     if (bq != aq)
       return bq - aq;
-    return a.sn.localeCompare(b.sn);
+    if (a.sn && b.sn)
+      return a.sn.localeCompare(b.sn);
     return 0;
   }
   function filterBest(ups, count, worst, negative) {
@@ -836,16 +847,16 @@
   }
   function sortUpgrades(ups) {
     return ups.sort((a, b) => {
-      if (a.name != b.name)
+      if (a.name !== undefined && b.name !== undefined && a.name != b.name)
         return a.name.localeCompare(b.name);
       let q = compareQuality(a, b);
       if (q != 0)
         return q;
-      if (a.tier != b.tier)
+      if (a.tier !== undefined && b.tier !== undefined && a.tier != b.tier)
         return b.tier - a.tier;
-      if (a.rarity != b.rarity)
+      if (a.rarity !== undefined && b.rarity !== undefined && a.rarity != b.rarity)
         return b.rarity - a.rarity;
-      if (a.loaded != b.loaded)
+      if (a.loaded !== undefined && b.loaded !== undefined && a.loaded != b.loaded)
         return b.loaded ? 1 : 0;
       return 0;
     });

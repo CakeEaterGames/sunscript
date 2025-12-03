@@ -52,7 +52,7 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
     aliases[k] = Aliases[k]
   }
 
-  let filtered:Upgrade[] = []
+  let filtered: Upgrade[] = []
 
   for (const stage of compiled.stages) {
     //When new stage begins we reset the context by clearing the _filtered marker
@@ -92,7 +92,7 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
           ups = filterBest(ups, w._worst, true, w.negative === true)
         }
         for (const u of ups) {
-          if(!filtered.includes(u)){
+          if (!filtered.includes(u)) {
             filtered.push(u)
           }
           u._filtered = true;
@@ -113,11 +113,11 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
 }
 
 function shortUpName(name: string) {
-  if(!name) return name
   return name.replace(/\_v\d$/gm, "").replace(/\_V\d$/gm, "")
 }
 
 export function getUpgradeValue(u: Upgrade): number | string {
+  if (!u.name) return 0
   let n = shortUpName(u.name)
   let dict: { [key: string]: commonTypes } =
   {
@@ -153,8 +153,10 @@ export function getUpgradeValue(u: Upgrade): number | string {
 }
 
 export function getUpgradeQuality(u: Upgrade): number {
+  if (!u.name) return 0
   let n = shortUpName(u.name)
   if (n == "k3y") {
+    if (!u.rarity) return 0;
     if (u.rarity == 0) return 3;
     if (u.rarity == 1) return 2;
     if (u.rarity >= 2) return 1;
@@ -222,6 +224,7 @@ function inRangeOrValue(val: commonTypes, range: range | commonTypes) {
 }
 
 function matchAlias(u: Upgrade, alias: string) {
+  if (!u.name) return false
   let n = shortUpName(u.name)
   if (aliases[alias] == n) return true;
   return false
@@ -247,6 +250,9 @@ function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
 }
 
 export function compareQuality(a: Upgrade, b: Upgrade) {
+  if (!a.name) return 0
+  if (!b.name) return 0
+
   let an = shortUpName(a.name)
   let bn = shortUpName(b.name)
   let aq = getUpgradeQuality(a)
@@ -257,8 +263,7 @@ export function compareQuality(a: Upgrade, b: Upgrade) {
   }
 
   if (bq != aq) return bq - aq;
-
-  return a.sn.localeCompare(b.sn)
+  if (a.sn && b.sn) return a.sn.localeCompare(b.sn)
 
   return 0;
 }
@@ -282,12 +287,12 @@ function performActions(up: Upgrade, actions: Action[]) {
 
 export function sortUpgrades(ups: Upgrade[]) {
   return ups.sort((a: Upgrade, b: Upgrade) => {
-    if (a.name != b.name) return a.name.localeCompare(b.name)
+    if (a.name !== undefined && b.name !== undefined && a.name != b.name) return a.name.localeCompare(b.name)
     let q = compareQuality(a, b)
     if (q != 0) return q;
-    if (a.tier != b.tier) return b.tier - a.tier
-    if (a.rarity != b.rarity) return b.rarity - a.rarity
-    if (a.loaded != b.loaded) return b.loaded ? 1 : 0;
+    if (a.tier !== undefined && b.tier !== undefined && a.tier != b.tier) return b.tier - a.tier
+    if (a.rarity !== undefined && b.rarity !== undefined && a.rarity != b.rarity) return b.rarity - a.rarity
+    if (a.loaded !== undefined && b.loaded !== undefined && a.loaded != b.loaded) return b.loaded ? 1 : 0;
 
     return 0
   })

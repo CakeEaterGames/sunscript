@@ -1,9 +1,9 @@
 export type Upgrade = {
-  i:number,
-  sn:"string",
-  name: string,
-  rarity: number,
-  tier: number,
+  i?:number,
+  sn?:"string",
+  name?: string,
+  rarity?: number,
+  tier?: number,
   cooldown?: number,
   [key: string]: commonTypes,
 }
