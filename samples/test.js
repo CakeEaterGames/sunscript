@@ -14,7 +14,9 @@ function(context, args) {
         c -> display            // Display all char_counts 
       `)
     let upgrades = #hs.sys.upgrades({ full: true })
-    let filtered = SUN.filter(upgrades, CharCountFilter)
+    let result = SUN.filter(upgrades, CharCountFilter)
+    let filtered = result.filtered
+    let filterTimes = result.filterTimes //Performance tracking
     // "filtered" will contain all items of array "upgrades" that triggered at least one rule in the list.
     // Array items now have additional properties: keep, sell, cull, price, the_best, display
     return upgrades.filter(a => a.display)

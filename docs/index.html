@@ -53,10 +53,10 @@
             container.appendChild(table);
         }
 
-        function loadMegafilter(){
+        function loadMegafilter() {
             let textarea = document.getElementById('sun_input');
             textarea.textContent = window.megafilter
-            recompile() 
+            recompile()
         }
 
     </script>
@@ -69,10 +69,11 @@
     </p>
     <p>
         Press to load the megafilter!
-        <button onclick="loadMegafilter()" >LOAD</button>
+        <button onclick="loadMegafilter()">LOAD</button>
     </p>
 
     <textarea class="my_area" name="sun_input" id="sun_input">
+
 
 
 alias c = char_count
@@ -85,6 +86,11 @@ c         -> cull;>                // Destroy all other char_counts
 c keep _best=3 -> the_best     
 c keep !the_best -> sell keep=undefined    // Only keep the best 3
 c -> display            // Display all char_counts 
+
+//This line does nothing on the parser side. It is specifically for the live demo.
+//Display these properties:
+//_COLUMNS_ i name _value cull keep sell price
+
     </textarea>
 
     <div id="table-container"></div>
@@ -128,17 +134,29 @@ c -> display            // Display all char_counts
 
         var displayed = []
         function recompile() {
+            let src = textarea.value
             displayed = JSON.parse(JSON.stringify(dataset))
 
-            let charFilter = lib.compile(textarea.value)
+            let columns = ["i", "name", "tier", "rarity", "_value"]
+
+            //look for a //_COLUMNS_ line
+            let st = src.indexOf('//_COLUMNS_')
+            let ed = src.indexOf('\n', st)
+            if (ed == -1) ed = src.length
+            if (st != -1) {
+                columns = src.substring(st, ed).replaceAll('//_COLUMNS_','').trim().split(" ")
+                console.log('//_COLUMNS_', columns);
+            }
+
+            let charFilter = lib.compile(src)
             let result = lib.filter(displayed, charFilter)
             displayed = displayed.filter((a) => a.display)
             lib.sortUpgrades(displayed)
 
             console.log(result.filterTimes);
             console.log(result.filterTime);
-            
-            createTable(displayed, 'table-container', ["i", "the_best", "name", "special", "snack","cull", "keep", "sell", "barter", "price", "original", "material", "extra", "anomaly"])
+
+            createTable(displayed, 'table-container', columns)
 
         }
 
