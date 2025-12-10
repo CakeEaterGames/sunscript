@@ -10,7 +10,7 @@ Have fun everyone
 
 Sunscript is Domain Specific Language ([DSL](https://en.wikipedia.org/wiki/Domain-specific_language)) for an MMO game called [Hackmud](https://hackmud.com). It is designed to solve one and only one specific problem in the game, **filtering of loot (upgrades)**. When you get to a certain progression point at the game you start to acquire thousands of individual items of various rarities, tiers, types and qualities. Deciding what to do with each individual item by hand is no longer possible and any attempt to create a proper filtering solution ends up becomes a long list of "if else" statements that is very difficult to read and modify.
 
-The more you use it the more readable and comfortable it becomes! 
+This language streamlines the filtering process. The more you use it the more readable and comfortable it becomes! 
 Try the [live demo](https://cakeeatergames.github.io/sunscript/)
 
 ## Usage
@@ -32,7 +32,9 @@ function(context, args) {
         c -> display            // Display all char_counts 
       `)
     let upgrades = #hs.sys.upgrades({ full: true })
-    let filtered = SUN.filter(upgrades, CharCountFilter)
+    let result = SUN.filter(upgrades, CharCountFilter)
+    let filtered = result.filtered 
+    let filterTimes = result.filterTimes //Performance tracking
     // "filtered" will contain all items of array "upgrades" that triggered at least one rule in the list.
     // Array items now have additional properties: keep, sell, cull, price, the_best, display
     return upgrades.filter(a => a.display)
@@ -62,10 +64,10 @@ SUNSCRIPT CAN'T be used as:
 
 | name              | arguments                               | returns          | description                                                                              |
 | ----------------- | --------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------- |
-| compile           | src : string                            | program          | Compile the SUN program into a reusable JSON objec                                       |
+| compile           | src : string                            | program          | Compile the SUN program into a reusable JSON object                                      |
 | filter            | upgrades : object[], compiled : program | object[]         | Filter and modify the upgrades array using the compiled program                          |
 | compileAndFilter  | upgrades : object[], src : string       | object[]         | combination of prior 2 methods                                                           |
-| sortUpgrades      | upgrades : object[]                     | object[]         | sorts an array of upgrades with my personal preffered order                              |
+| sortUpgrades      | upgrades : object[]                     | object[]         | sorts an array of upgrades with my personal preferred order                              |
 | getUpgradeValue   | object                                  | number \| string | returns an upgrade value that is used for filtering in SUN filters                       |
 | getUpgradeQuality | object                                  | number           | returns a numeric value of upgrade. Value can be negative, e.g. upgrades with cooldowns. |
 | Aliases           | N/A                                     | N/A              | Dictionary object of aliases                                                             |
@@ -338,7 +340,7 @@ function getUpgradeValue(u) {
 
 ## Samples
 
-Wind the working samples in the "samples" dir.
+Find the working samples in the "samples" dir.
 Also try the [live demo](https://cakeeatergames.github.io/sunscript/)
 
 ## Contribute
