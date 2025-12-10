@@ -453,6 +453,11 @@ cull      -> !send;>
 ---
 
 * -> display
+
+//This line does nothing on the parser side. It is specifically for the live demo.
+//Display these properties:
+//_COLUMNS_ i the_best name _value snack cull keep sell barter price original material extra anomaly
+
 `
 window.megafilter = code
 })()
