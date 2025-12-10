@@ -116,6 +116,9 @@ alias x = l0ckjaw
 
 alias k = k3y
 
+// skip everything that is not a key. This line optimizes the stage by 27%
+k3y=undefined ->;>
+
 -k[vc2c7q] rarity=0:1 _best=3 -> original
 -k[tvfkyq] rarity=0:1 _best=3 -> original
 -k[xwz7ja] rarity=0:1 _best=3 -> original
@@ -202,10 +205,12 @@ k extra -> sell
 ---
 
 //Price list
-*1 !name=k3y !snack -> price=0GC
+*1 !name=k3y !snack -> price=0GC;>
 
----
-
+//Don't check the price for everything that we're already keeping
+//Comment out if you want to see prices for all items
+//40% optimization
+keep -> ;>
 
 alias x = acct_nt
 x[12:*] -> price=100BGC barter;>
@@ -350,7 +355,7 @@ x -> price=0GC;>
 
 
 ---
-
+k3y=undefined ->;>
 
 //Key prices
 k*0[vc2c7q] -> price=25MGC cheap_key
