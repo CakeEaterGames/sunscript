@@ -5,6 +5,13 @@ export type Upgrade = {
   rarity?: number,
   tier?: number,
   cooldown?: number,
+  
+  _short?: string,
+  _quality?: number,
+  _rank?: number,
+  _value?: number | string,
+  _filtered?: boolean,
+
   [key: string]: commonTypes,
 }
 

@@ -94,8 +94,22 @@ c -> display            // Display all char_counts
 
     <script>
         let lib = SUN({ import: true })
-        console.log(SUN())
-        console.log(dataset)
+        // console.log(SUN())
+        // console.log(dataset)
+
+        //Optimization journey
+        //261
+        //228
+        //186
+        //180
+        //170
+        //160
+
+        //Uncomment to stress test
+        // for (let i = 0; i < 3; i++) {
+        //     dataset = dataset.concat(dataset)            
+        // }
+
         for (const u of dataset) {
             u.special = lib.getUpgradeValue(u)
         }
@@ -117,10 +131,13 @@ c -> display            // Display all char_counts
             displayed = JSON.parse(JSON.stringify(dataset))
 
             let charFilter = lib.compile(textarea.value)
-            lib.filter(displayed, charFilter)
+            let result = lib.filter(displayed, charFilter)
             displayed = displayed.filter((a) => a.display)
             lib.sortUpgrades(displayed)
 
+            console.log(result.filterTimes);
+            console.log(result.filterTime);
+            
             createTable(displayed, 'table-container', ["i", "the_best", "name", "special", "snack","cull", "keep", "sell", "barter", "price", "original", "material", "extra", "anomaly"])
 
         }

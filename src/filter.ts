@@ -47,11 +47,6 @@ let aliases: typeof Aliases
 
 let dataset: Upgrade[];
 
-
-export function compileAndFilterStages(upgrades: Array<Upgrade>, src: string) {
-  filter(upgrades, compile(src))
-}
-
 export function compileAndFilter(upgrades: Array<Upgrade>, src: string) {
   return filter(upgrades, compile(src))
 }
@@ -62,9 +57,23 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
     aliases[k] = Aliases[k]
   }
 
+  // Prepare all upgrade values and pre sort the array
+  for (const u of upgrades) {
+    if (u.name) u._short = shortUpName(u.name)
+    u._value = getUpgradeValue(u)
+    u._quality = getUpgradeQuality(u)
+  }
+  sortUpgrades(upgrades)
+  for (let i = 0; i < upgrades.length; i++) {
+    upgrades[i]._rank = i;
+  }
+
   let filtered: Upgrade[] = []
+  let filterTimes: number[] = []
 
   for (const stage of compiled.stages) {
+    let startTime = Date.now()
+    let endTime = startTime
     //When new stage begins we reset the context by clearing the _filtered marker
     dataset = [...upgrades]
     for (const u of dataset) {
@@ -112,6 +121,8 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
         }
       }
     }
+    endTime = Date.now()
+    filterTimes.push(endTime - startTime)
   }
 
   //cleanup
@@ -119,7 +130,15 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
     delete u._filtered;
   }
 
-  return filtered
+  let filterTime = 0
+  for (const t of filterTimes) filterTime += t
+
+  return {
+    filtered: filtered,
+    filterTimes: filterTimes,
+    filterTime: filterTime,
+  }
+  // return filtered
 }
 
 
@@ -243,10 +262,14 @@ function inRangeOrValue(val: commonTypes, range: range | commonTypes) {
 }
 
 function matchAlias(u: Upgrade, alias: string) {
-  if (!u.name) return false
-  let n = shortUpName(u.name)
-  if (aliases[alias] == n) return true;
-  return false
+  if (!u._short) return false
+  return aliases[alias] == u._short;
+
+  // This is no longer needed
+  // if (!u.name) return false
+  // let n = shortUpName(u.name)
+  // if (aliases[alias] == n) return true;
+  // return false
 }
 
 function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
@@ -256,7 +279,8 @@ function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
     if (f.filterType == "sun") {
       if (f.alias && !matchAlias(u, f.alias) !== negative) return false
       if (f.ready != undefined && ((f.ready != upReady(u)) !== negative)) return false;
-      if (f.value != undefined && ((!inRangeOrValue(getUpgradeValue(u), f.value)) !== negative)) return false;
+      // if (f.value != undefined && ((!inRangeOrValue(getUpgradeValue(u), f.value)) !== negative)) return false;
+      if (f.value != undefined && ((!inRangeOrValue(u._value, f.value)) !== negative)) return false;
     }
 
     for (const k in f) {
@@ -272,28 +296,64 @@ export function compareQuality(a: Upgrade, b: Upgrade) {
   if (!a.name) return 0
   if (!b.name) return 0
 
-  let an = shortUpName(a.name)
-  let bn = shortUpName(b.name)
-  let aq = getUpgradeQuality(a)
-  let bq = getUpgradeQuality(b)
+  // let an = shortUpName(a.name)
+  // let bn = shortUpName(b.name)
+  let an = a._short
+  let bn = b._short
+  // let aq = getUpgradeQuality(a)
+  // let bq = getUpgradeQuality(b)
+  let aq = a._quality
+  let bq = b._quality
   if (an != bn) return 0;
   if (an == 'k3y' && a.k3y != b.k3y) {
     return 0;
   }
 
-  if (bq != aq) return bq - aq;
+  if (aq !== undefined && bq !== undefined && bq != aq) return bq - aq;
   if (a.sn && b.sn) return a.sn.localeCompare(b.sn)
 
   return 0;
 }
 
+// function filterBest(ups: Upgrade[], count: number, worst: boolean, negative: boolean): Upgrade[] {
+//   ups.sort(compareQuality)
+//   if (worst) ups.reverse()
+//   if (!negative) return ups.slice(0, count)
+//   if (negative) return ups.slice(count);
+//   return []
+// }
+
+function isSorted(ups: Upgrade[]) {
+  //Helping function for development 
+  if (ups.length <= 1) return true
+  for (let i = 1; i < ups.length; i++) {
+    if (ups[i]._rank! <= ups[i - 1]._rank!) return false
+  }
+  return true
+}
+
 function filterBest(ups: Upgrade[], count: number, worst: boolean, negative: boolean): Upgrade[] {
-  ups.sort(compareQuality)
-  if (worst) ups.reverse()
-  if (!negative) return ups.slice(0, count)
-  if (negative) return ups.slice(count);
+  //optimized filterBest.
+  //Assuming that upgrades are already in sorted order
+
+  // if(!isSorted(ups)){
+  //   console.log("UNSORTED");
+  //   console.log(ups);
+  // }
+
+  if (worst && negative) {
+    return ups.slice(0, ups.length - count)
+  } else if (worst && !negative) {
+    return ups.slice(ups.length - count)
+  } else if (!worst && negative) {
+    return ups.slice(count)
+  } else if (!worst && !negative) {
+    return ups.slice(0, count)
+  }
+
   return []
 }
+
 
 function performActions(up: Upgrade, actions: Action[]) {
   for (const a of actions) {

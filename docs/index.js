@@ -44,7 +44,7 @@
     function compareFromI(a, b, i) {
       return a.substring(i, i + b.length) == b;
     }
-    let spaces = " \t\r";
+    let spaces = " 	\r";
     let res = [];
     let acc = "";
     mainLoop:
@@ -619,8 +619,21 @@
     for (const k in Aliases) {
       aliases[k] = Aliases[k];
     }
+    for (const u of upgrades) {
+      if (u.name)
+        u._short = shortUpName(u.name);
+      u._value = getUpgradeValue(u);
+      u._quality = getUpgradeQuality(u);
+    }
+    sortUpgrades(upgrades);
+    for (let i = 0;i < upgrades.length; i++) {
+      upgrades[i]._rank = i;
+    }
     let filtered = [];
+    let filterTimes = [];
     for (const stage of compiled.stages) {
+      let startTime = Date.now();
+      let endTime = startTime;
       dataset = [...upgrades];
       for (const u of dataset) {
         delete u._filtered;
@@ -667,11 +680,20 @@
           }
         }
       }
+      endTime = Date.now();
+      filterTimes.push(endTime - startTime);
     }
     for (const u of upgrades) {
       delete u._filtered;
     }
-    return filtered;
+    let filterTime = 0;
+    for (const t of filterTimes)
+      filterTime += t;
+    return {
+      filtered,
+      filterTimes,
+      filterTime
+    };
   }
   var shortNameCache = {};
   function shortUpName(name) {
@@ -796,12 +818,9 @@
     return false;
   }
   function matchAlias(u, alias) {
-    if (!u.name)
+    if (!u._short)
       return false;
-    let n = shortUpName(u.name);
-    if (aliases[alias] == n)
-      return true;
-    return false;
+    return aliases[alias] == u._short;
   }
   function filterOneUpgrade(u, filters) {
     for (const f of filters) {
@@ -811,7 +830,7 @@
           return false;
         if (f.ready != null && f.ready != upReady(u) !== negative)
           return false;
-        if (f.value != null && !inRangeOrValue(getUpgradeValue(u), f.value) !== negative)
+        if (f.value != null && !inRangeOrValue(u._value, f.value) !== negative)
           return false;
       }
       for (const k in f) {
@@ -829,29 +848,31 @@
       return 0;
     if (!b.name)
       return 0;
-    let an = shortUpName(a.name);
-    let bn = shortUpName(b.name);
-    let aq = getUpgradeQuality(a);
-    let bq = getUpgradeQuality(b);
+    let an = a._short;
+    let bn = b._short;
+    let aq = a._quality;
+    let bq = b._quality;
     if (an != bn)
       return 0;
     if (an == "k3y" && a.k3y != b.k3y) {
       return 0;
     }
-    if (bq != aq)
+    if (aq !== undefined && bq !== undefined && bq != aq)
       return bq - aq;
     if (a.sn && b.sn)
       return a.sn.localeCompare(b.sn);
     return 0;
   }
   function filterBest(ups, count, worst, negative) {
-    ups.sort(compareQuality);
-    if (worst)
-      ups.reverse();
-    if (!negative)
-      return ups.slice(0, count);
-    if (negative)
+    if (worst && negative) {
+      return ups.slice(0, ups.length - count);
+    } else if (worst && !negative) {
+      return ups.slice(ups.length - count);
+    } else if (!worst && negative) {
       return ups.slice(count);
+    } else if (!worst && !negative) {
+      return ups.slice(0, count);
+    }
     return [];
   }
   function performActions(up, actions) {
