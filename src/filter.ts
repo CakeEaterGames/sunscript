@@ -355,7 +355,7 @@ function performActions(up: Upgrade, actions: Action[]) {
 
 export function sortUpgrades(ups: Upgrade[]) {
   return ups.sort((a: Upgrade, b: Upgrade) => {
-    if (a.name !== undefined && b.name !== undefined && a.name != b.name) return a.name.localeCompare(b.name)
+    if (a._short !== undefined && b._short !== undefined && a._short != b._short) return a._short.localeCompare(b._short)
     let q = compareQuality(a, b)
     if (q != 0) return q;
     if (a.tier !== undefined && b.tier !== undefined && a.tier != b.tier) return b.tier - a.tier

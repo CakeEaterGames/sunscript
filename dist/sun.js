@@ -881,8 +881,8 @@ function(context,args){ //
   }
   function sortUpgrades(ups) {
     return ups.sort((a, b) => {
-      if (a.name !== undefined && b.name !== undefined && a.name != b.name)
-        return a.name.localeCompare(b.name);
+      if (a._short !== undefined && b._short !== undefined && a._short != b._short)
+        return a._short.localeCompare(b._short);
       let q = compareQuality(a, b);
       if (q != 0)
         return q;
