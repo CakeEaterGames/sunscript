@@ -621,12 +621,6 @@ function(context,args){ //
     for (const k in Aliases) {
       aliases[k] = Aliases[k];
     }
-    for (const u of upgrades) {
-      if (u.name)
-        u._short = shortUpName(u.name);
-      u._value = getUpgradeValue(u);
-      u._quality = getUpgradeQuality(u);
-    }
     sortUpgrades(upgrades);
     for (let i = 0;i < upgrades.length; i++) {
       upgrades[i]._rank = i;
@@ -856,8 +850,6 @@ function(context,args){ //
     let bq = b._quality;
     if (aq !== undefined && bq !== undefined && bq != aq)
       return bq - aq;
-    if (a.sn && b.sn)
-      return a.sn.localeCompare(b.sn);
     return 0;
   }
   function filterBest(ups, count, worst, negative) {
@@ -880,6 +872,12 @@ function(context,args){ //
     }
   }
   function sortUpgrades(ups) {
+    for (const u of ups) {
+      if (u.name)
+        u._short = shortUpName(u.name);
+      u._value = getUpgradeValue(u);
+      u._quality = getUpgradeQuality(u);
+    }
     return ups.sort((a, b) => {
       if (a._short !== undefined && b._short !== undefined && a._short != b._short)
         return a._short.localeCompare(b._short);
@@ -894,6 +892,8 @@ function(context,args){ //
         return b.loaded ? 1 : 0;
       if (a.price !== undefined && b.price !== undefined && a.price != b.price)
         return a.price - b.price;
+      if (a.sn !== undefined && b.sn !== undefined && a.sn !== b.sn)
+        return a.sn.localeCompare(b.sn);
       return 0;
     });
   }

@@ -58,12 +58,8 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
   }
 
   // Prepare all upgrade values and pre sort the array
-  for (const u of upgrades) {
-    if (u.name) u._short = shortUpName(u.name)
-    u._value = getUpgradeValue(u)
-    u._quality = getUpgradeQuality(u)
-  }
   sortUpgrades(upgrades)
+
   for (let i = 0; i < upgrades.length; i++) {
     upgrades[i]._rank = i;
   }
@@ -299,8 +295,6 @@ export function compareQuality(a: Upgrade, b: Upgrade) {
   let aq = a._quality
   let bq = b._quality
   if (aq !== undefined && bq !== undefined && bq != aq) return bq - aq;
-  if (a.sn && b.sn) return a.sn.localeCompare(b.sn)
-
   return 0;
 }
 
@@ -354,6 +348,13 @@ function performActions(up: Upgrade, actions: Action[]) {
 
 
 export function sortUpgrades(ups: Upgrade[]) {
+
+  for (const u of ups) {
+    if (u.name) u._short = shortUpName(u.name)
+    u._value = getUpgradeValue(u)
+    u._quality = getUpgradeQuality(u)
+  }
+
   return ups.sort((a: Upgrade, b: Upgrade) => {
     if (a._short !== undefined && b._short !== undefined && a._short != b._short) return a._short.localeCompare(b._short)
     let q = compareQuality(a, b)
@@ -362,7 +363,8 @@ export function sortUpgrades(ups: Upgrade[]) {
     if (a.rarity !== undefined && b.rarity !== undefined && a.rarity != b.rarity) return b.rarity - a.rarity
     if (a.loaded !== undefined && b.loaded !== undefined && a.loaded != b.loaded) return b.loaded ? 1 : 0;
     if (a.price !== undefined && b.price !== undefined && a.price != b.price) return a.price - b.price
-
+    if (a.sn !== undefined && b.sn !== undefined && a.sn !== b.sn) return a.sn.localeCompare(b.sn)
+    
     return 0
   })
 }

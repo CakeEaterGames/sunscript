@@ -1,6 +1,6 @@
 export type Upgrade = {
   i?:number,
-  sn?:"string",
+  sn?:string,
   name?: string,
   rarity?: number,
   tier?: number,
