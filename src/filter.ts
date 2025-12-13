@@ -296,19 +296,13 @@ export function compareQuality(a: Upgrade, b: Upgrade) {
   if (!a.name) return 0
   if (!b.name) return 0
 
-  // let an = shortUpName(a.name)
-  // let bn = shortUpName(b.name)
-  let an = a._short
-  let bn = b._short
-  // let aq = getUpgradeQuality(a)
-  // let bq = getUpgradeQuality(b)
+  if (a._short != b._short) return 0;
+  // if (a._short == 'k3y' && a.k3y != b.k3y) {
+  //   return 0;
+  // }
+
   let aq = a._quality
   let bq = b._quality
-  if (an != bn) return 0;
-  if (an == 'k3y' && a.k3y != b.k3y) {
-    return 0;
-  }
-
   if (aq !== undefined && bq !== undefined && bq != aq) return bq - aq;
   if (a.sn && b.sn) return a.sn.localeCompare(b.sn)
 
