@@ -11,6 +11,7 @@ export type Upgrade = {
   _rank?: number,
   _value?: number | string,
   _filtered?: boolean,
+  price?: number,
 
   [key: string]: commonTypes,
 }

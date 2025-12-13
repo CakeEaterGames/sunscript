@@ -361,6 +361,7 @@ export function sortUpgrades(ups: Upgrade[]) {
     if (a.tier !== undefined && b.tier !== undefined && a.tier != b.tier) return b.tier - a.tier
     if (a.rarity !== undefined && b.rarity !== undefined && a.rarity != b.rarity) return b.rarity - a.rarity
     if (a.loaded !== undefined && b.loaded !== undefined && a.loaded != b.loaded) return b.loaded ? 1 : 0;
+    if (a.price !== undefined && b.price !== undefined && a.price != b.price) return a.price - b.price
 
     return 0
   })
