@@ -295,12 +295,7 @@ function filterOneUpgrade(u: Upgrade, filters: Filter[]) {
 export function compareQuality(a: Upgrade, b: Upgrade) {
   if (!a.name) return 0
   if (!b.name) return 0
-
   if (a._short != b._short) return 0;
-  // if (a._short == 'k3y' && a.k3y != b.k3y) {
-  //   return 0;
-  // }
-
   let aq = a._quality
   let bq = b._quality
   if (aq !== undefined && bq !== undefined && bq != aq) return bq - aq;
