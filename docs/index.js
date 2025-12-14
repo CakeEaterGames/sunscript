@@ -891,7 +891,7 @@
       if (a.price !== undefined && b.price !== undefined && a.price != b.price)
         return a.price - b.price;
       if (a.sn !== undefined && b.sn !== undefined && a.sn !== b.sn)
-        return a.sn.localeCompare(b.sn);
+        return b.sn.localeCompare(a.sn);
       return 0;
     });
   }

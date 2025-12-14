@@ -363,7 +363,7 @@ export function sortUpgrades(ups: Upgrade[]) {
     if (a.rarity !== undefined && b.rarity !== undefined && a.rarity != b.rarity) return b.rarity - a.rarity
     if (a.loaded !== undefined && b.loaded !== undefined && a.loaded != b.loaded) return b.loaded ? 1 : 0;
     if (a.price !== undefined && b.price !== undefined && a.price != b.price) return a.price - b.price
-    if (a.sn !== undefined && b.sn !== undefined && a.sn !== b.sn) return a.sn.localeCompare(b.sn)
+    if (a.sn !== undefined && b.sn !== undefined && a.sn !== b.sn) return b.sn.localeCompare(a.sn)
     
     return 0
   })
