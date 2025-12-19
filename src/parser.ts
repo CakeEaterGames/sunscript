@@ -220,7 +220,7 @@ function parseAction(): response<Action> {
   skipSpaces()
 
   if (isAlphaNum(cur) || cur == ';') {
-    let v : boolean | "undefined" = true
+    let v: boolean | "undefined" = true
 
     if (setToUndefined) {
       v = "undefined"; //YES like that
@@ -384,9 +384,14 @@ function parseSUN(): response<SUNFilter> {
       advance()
       if (cur == '*') consume('*')
       else if (cur == ' ') { }
-      else if ((cur + "").length == 1 && !isNaN(Number(cur))) {
+      else if ((cur + "").length == 1 && !isNaN(Number(cur))) { //*2
         r.tier = Number(cur);
         advance()
+      } else if ((cur + "").length == 2 && !isNaN(Number(cur))) { //*21
+        r.tier = Number(cur[0]);
+        r.rarity = Number(cur[1]);
+        advance()
+        break;
       }
 
       if (cur == '*') consume('*')
