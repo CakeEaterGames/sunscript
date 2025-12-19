@@ -898,7 +898,7 @@
       if (a.price !== undefined && b.price !== undefined && a.price != b.price)
         return a.price - b.price;
       if (a._priority != b._priority)
-        return a._priority - b._priority;
+        return b._priority - a._priority;
       if (a.sn !== undefined && b.sn !== undefined && a.sn !== b.sn)
         return a.sn.localeCompare(b.sn);
       return 0;
