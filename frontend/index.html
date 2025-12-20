@@ -52,6 +52,21 @@
 
             container.appendChild(table);
         }
+        function shuffle(array) {
+            let currentIndex = array.length;
+
+            // While there remain elements to shuffle...
+            while (currentIndex != 0) {
+
+                // Pick a remaining element...
+                let randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                // And swap it with the current element.
+                [array[currentIndex], array[randomIndex]] = [
+                    array[randomIndex], array[currentIndex]];
+            }
+        }
 
         function loadMegafilter() {
             let textarea = document.getElementById('sun_input');
@@ -99,22 +114,18 @@ c -> display            // Display all char_counts
 
 
     <script>
+
+
         let lib = SUN({ import: true })
         // console.log(SUN())
-        // console.log(dataset)
-
-        //Optimization journey
-        //261
-        //228
-        //186
-        //180
-        //170
-        //160
+        // console.log(dataset) 
 
         //Uncomment to stress test
         // for (let i = 0; i < 3; i++) {
         //     dataset = dataset.concat(dataset)            
         // }
+
+
 
         for (const u of dataset) {
             u.special = lib.getUpgradeValue(u)
@@ -133,7 +144,10 @@ c -> display            // Display all char_counts
         });
 
         var displayed = []
+        let last = ""
         function recompile() {
+            shuffle(dataset)
+
             let src = textarea.value
             displayed = JSON.parse(JSON.stringify(dataset))
 
@@ -144,12 +158,19 @@ c -> display            // Display all char_counts
             let ed = src.indexOf('\n', st)
             if (ed == -1) ed = src.length
             if (st != -1) {
-                columns = src.substring(st, ed).replaceAll('//_COLUMNS_','').trim().split(" ")
-                console.log('//_COLUMNS_', columns);
+                columns = src.substring(st, ed).replaceAll('//_COLUMNS_', '').trim().split(" ")
             }
 
             let charFilter = lib.compile(src)
             let result = lib.filter(displayed, charFilter)
+            
+            for (let i = 0; i < result.filtered.length; i++) {
+                if (JSON.stringify(last[i]) != JSON.stringify(result.filtered[i])) {
+                    console.log("UNEQUAL", last[i], result.filtered[i])
+                }
+            }
+            last = JSON.parse(JSON.stringify(result.filtered));
+
             displayed = displayed.filter((a) => a.display)
             lib.sortUpgrades(displayed)
 
@@ -157,13 +178,13 @@ c -> display            // Display all char_counts
             console.log(result.filterTime);
 
             createTable(displayed, 'table-container', columns)
-
         }
-
-
 
         recompile()
 
+        // setInterval(() => {
+        //     recompile()
+        // }, 3000);
 
     </script>
 

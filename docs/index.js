@@ -883,7 +883,7 @@
       u._value = getUpgradeValue(u);
       u._quality = getUpgradeQuality(u);
     }
-    return ups.sort((a, b) => {
+    function srt(a, b) {
       if (a._short !== undefined && b._short !== undefined && a._short != b._short)
         return a._short.localeCompare(b._short);
       let q = compareQuality(a, b);
@@ -894,7 +894,7 @@
       if (a.rarity !== undefined && b.rarity !== undefined && a.rarity != b.rarity)
         return b.rarity - a.rarity;
       if (a.loaded !== undefined && b.loaded !== undefined && a.loaded != b.loaded)
-        return b.loaded ? 1 : 0;
+        return b.loaded ? 1 : -1;
       if (a.price !== undefined && b.price !== undefined && a.price != b.price)
         return a.price - b.price;
       if (a._priority != b._priority)
@@ -902,7 +902,8 @@
       if (a.sn !== undefined && b.sn !== undefined && a.sn !== b.sn)
         return a.sn.localeCompare(b.sn);
       return 0;
-    });
+    }
+    return ups.sort(srt);
   }
 
   // src/index.ts
