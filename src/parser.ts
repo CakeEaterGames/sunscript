@@ -362,13 +362,16 @@ function parseSUN(): response<SUNFilter> {
   switch (cur.length) {
     case 3: {
       r.alias = cur[0]
-      if (!isNaN(Number(cur[1]))) r.tier = Number(cur[1])
-      if (!isNaN(Number(cur[2]))) r.rarity = Number(cur[2])
+      if (isNaN(Number(cur[1]))) return expectedError(["number"], cur[1], "SUN Rule error. ") as response<SUNFilter>
+      if (isNaN(Number(cur[2]))) return expectedError(["number"], cur[2], "SUN Rule error. ") as response<SUNFilter>
+      r.tier = Number(cur[1])
+      r.rarity = Number(cur[2])
       advance()
     } break;
     case 2: {
       r.alias = cur[0]
-      if (!isNaN(Number(cur[1]))) r.tier = Number(cur[1])
+      if (isNaN(Number(cur[1]))) return expectedError(["number"], cur[1], "SUN Rule error. ") as response<SUNFilter>
+      r.tier = Number(cur[1])
       advance()
 
       if (cur == '*') consume('*')
@@ -377,7 +380,6 @@ function parseSUN(): response<SUNFilter> {
         r.rarity = Number(cur);
         advance()
       }
-
     } break;
     case 1: {
       r.alias = cur[0]
