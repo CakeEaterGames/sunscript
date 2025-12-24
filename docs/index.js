@@ -44,7 +44,7 @@
     function compareFromI(a, b, i) {
       return a.substring(i, i + b.length) == b;
     }
-    let spaces = " \t\r";
+    let spaces = " 	\r";
     let res = [];
     let acc = "";
     mainLoop:
@@ -383,18 +383,21 @@
       case 3:
         {
           r.alias = cur[0];
-          if (!isNaN(Number(cur[1])))
-            r.tier = Number(cur[1]);
-          if (!isNaN(Number(cur[2])))
-            r.rarity = Number(cur[2]);
+          if (isNaN(Number(cur[1])))
+            return expectedError(["number"], cur[1], "SUN Rule error. ");
+          if (isNaN(Number(cur[2])))
+            return expectedError(["number"], cur[2], "SUN Rule error. ");
+          r.tier = Number(cur[1]);
+          r.rarity = Number(cur[2]);
           advance();
         }
         break;
       case 2:
         {
           r.alias = cur[0];
-          if (!isNaN(Number(cur[1])))
-            r.tier = Number(cur[1]);
+          if (isNaN(Number(cur[1])))
+            return expectedError(["number"], cur[1], "SUN Rule error. ");
+          r.tier = Number(cur[1]);
           advance();
           if (cur == "*")
             consume("*");
