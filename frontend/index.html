@@ -162,14 +162,15 @@ c -> display            // Display all char_counts
             }
 
             let charFilter = lib.compile(src)
+            let trans = lib.transpile(charFilter)
             let result = lib.filter(displayed, charFilter)
             
-            for (let i = 0; i < result.filtered.length; i++) {
-                if (JSON.stringify(last[i]) != JSON.stringify(result.filtered[i])) {
-                    console.log("UNEQUAL", last[i], result.filtered[i])
-                }
-            }
-            last = JSON.parse(JSON.stringify(result.filtered));
+            // for (let i = 0; i < result.filtered.length; i++) {
+            //     if (JSON.stringify(last[i]) != JSON.stringify(result.filtered[i])) {
+            //         console.log("UNEQUAL", last[i], result.filtered[i])
+            //     }
+            // }
+            // last = JSON.parse(JSON.stringify(result.filtered));
 
             displayed = displayed.filter((a) => a.display)
             lib.sortUpgrades(displayed)

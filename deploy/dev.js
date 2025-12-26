@@ -25,7 +25,7 @@ const watcher2 = watch('./frontend', { recursive: true }, async (eventType, file
 
 // Start server
 const server = Bun.serve({
-  port: 3000,
+  port: 3456,
   async fetch(req) {
     const filePath = outputPath + new URL(req.url).pathname;
     const file = Bun.file(filePath);

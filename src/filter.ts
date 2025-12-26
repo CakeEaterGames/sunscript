@@ -60,9 +60,6 @@ export function filter(upgrades: Array<Upgrade>, compiled: Program) {
   // Prepare all upgrade values and pre sort the array
   sortUpgrades(upgrades)
 
-  for (let i = 0; i < upgrades.length; i++) {
-    upgrades[i]._rank = i;
-  }
 
   let filtered: Upgrade[] = []
   let filterTimes: number[] = []
@@ -315,7 +312,7 @@ function isSorted(ups: Upgrade[]) {
   return true
 }
 
-function filterBest(ups: Upgrade[], count: number, worst: boolean, negative: boolean): Upgrade[] {
+export function filterBest(ups: Upgrade[], count: number, worst: boolean, negative: boolean): Upgrade[] {
   //optimized filterBest.
   //Assuming that upgrades are already in sorted order
 
@@ -367,7 +364,11 @@ export function sortUpgrades(ups: Upgrade[]) {
     if (a.sn !== undefined && b.sn !== undefined && a.sn !== b.sn) return a.sn.localeCompare(b.sn)
     return 0
   }
-  return ups.sort(srt)
+  ups.sort(srt)
+  for (let i = 0; i < ups.length; i++) {
+    ups[i]._rank = i;
+  }
+  return ups
 }
 
 

@@ -1,10 +1,13 @@
 import { compile } from "./compiler";
 import { Aliases, compileAndFilter, filter, getUpgradeQuality, getUpgradeValue, sortUpgrades } from "./filter";
+import { Transpiler } from "./transpiler";
 
 function SUN(args: any) {
+
   if (args && args.import === true)
     return {
       compile,
+      transpile: Transpiler.transpile,
       filter,
       compileAndFilter,
       sortUpgrades,
