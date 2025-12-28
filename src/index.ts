@@ -1,5 +1,5 @@
 import { compile } from "./compiler";
-import { Aliases, compileAndFilter, filter, getUpgradeQuality, getUpgradeValue, sortUpgrades } from "./filter";
+import { Aliases, compareQuality, compileAndFilter, filter, getUpgradeQuality, getUpgradeValue, sortUpgrades } from "./filter";
 import { Transpiler } from "./transpiler";
 
 function SUN(args: any) {
@@ -13,7 +13,8 @@ function SUN(args: any) {
       sortUpgrades,
       getUpgradeValue,
       getUpgradeQuality,
-      Aliases
+      Aliases,
+      compareQuality,
     }
 
   //This is quite ugly but trust me, it looks aligned in the game

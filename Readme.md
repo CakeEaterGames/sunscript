@@ -70,6 +70,7 @@ SUNSCRIPT CAN'T be used as:
 | sortUpgrades      | upgrades : object[]                     | object[]         | sorts an array of upgrades with my personal preferred order                              |
 | getUpgradeValue   | object                                  | number \| string | returns an upgrade value that is used for filtering in SUN filters                       |
 | getUpgradeQuality | object                                  | number           | returns a numeric value of upgrade. Value can be negative, e.g. upgrades with cooldowns. |
+| compareQuality    | object, object                          | number           | function that is compatible with Array.sort for upgrades                                 |
 | Aliases           | N/A                                     | N/A              | Dictionary object of aliases                                                             |
 
 

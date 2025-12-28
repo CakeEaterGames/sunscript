@@ -46,7 +46,7 @@ function(context,args){ //
     function compareFromI(a, b, i) {
       return a.substring(i, i + b.length) == b;
     }
-    let spaces = " 	\r";
+    let spaces = " \t\r";
     let res = [];
     let acc = "";
     mainLoop:
@@ -1122,7 +1122,8 @@ ${actions}
         sortUpgrades,
         getUpgradeValue,
         getUpgradeQuality,
-        Aliases
+        Aliases,
+        compareQuality
       };
     let comment = "\/\/";
     let a = `    'J╔══════════════════════════════════════════════════════════════╗'    
