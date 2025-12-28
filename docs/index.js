@@ -989,8 +989,11 @@ ${stages.join(betweenStages())}
       let actions = acts.join(`
 `);
       let conditions = conds.filter((a) => a.trim()).join(" && ");
-      let best = rule.filters?.find((a) => a._best);
-      let worst = rule.filters?.find((a) => a._worst);
+      let best, worst;
+      if (rule.filters) {
+        best = rule.filters.find((a) => a._best);
+        worst = rule.filters.find((a) => a._worst);
+      }
       let v, neg;
       if (best) {
         v = best._best;
