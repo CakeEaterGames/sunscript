@@ -187,10 +187,13 @@ export function getUpgradeQuality(u: Upgrade): number {
   if (!u.name) return 0
   let n = shortUpName(u.name)
   if (n == "k3y") {
-    if (!u.rarity) return 0;
-    if (u.rarity == 0) return 3;
-    if (u.rarity == 1) return 2;
-    if (u.rarity >= 2) return 1;
+    if (u.rarity == 0) return 6;
+    if (u.rarity == 1) return 5;
+    if (u.rarity == 2) return 4;
+    if (u.rarity == 3) return 3;
+    if (u.rarity == 4) return 2;
+    if (u.rarity == 5) return 1;
+    return 0;
   }
   let dict = {
     "CON_SPEC": u.p2_len,

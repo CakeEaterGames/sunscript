@@ -39,7 +39,7 @@ const server = Bun.serve({
   }
 });
 
-console.log(`Server running at http://localhost:3000`);
+console.log(`Server running at http://localhost:3456`);
 console.log('Watching for changes in ./src...');
 
 // Cleanup on exit
